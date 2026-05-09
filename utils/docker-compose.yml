@@ -1,0 +1,8 @@
+services:
+  duckling:
+    image: rasa/duckling:latest
+    container_name: duckling
+    ports:
+      - "8000:8000"
+    restart: always
+    platform: linux/amd64
