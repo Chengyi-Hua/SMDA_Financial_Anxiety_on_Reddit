@@ -1,0 +1,5 @@
+﻿community,year,n_posts,manual_plausible,manual_plausible_with_caveat,manual_questionable,xlm_plausible_or_caveat,xlm_questionable,vader_plausible,vader_misleading,emoji_no_emoji,emoji_affective_or_tone_relevant,emoji_symbolic_or_context_dependent,manual_plausible_share_percent,manual_plausible_with_caveat_share_percent,manual_questionable_share_percent,xlm_plausible_or_caveat_share_percent,xlm_questionable_share_percent,vader_plausible_share_percent,vader_misleading_share_percent,emoji_no_emoji_share_percent,emoji_affective_or_tone_relevant_share_percent,emoji_symbolic_or_context_dependent_share_percent
+finanzen,2020,13,12,0,1,12,1,5,8,9,4,0,92.31,0.0,7.69,92.31,7.69,38.46,61.54,69.23,30.77,0.0
+finanzen,2025,13,12,1,0,13,0,5,8,9,3,1,92.31,7.69,0.0,100.0,0.0,38.46,61.54,69.23,23.08,7.69
+personalfinance,2020,13,10,2,1,13,0,7,6,9,2,2,76.92,15.38,7.69,100.0,0.0,53.85,46.15,69.23,15.38,15.38
+personalfinance,2025,13,13,0,0,13,0,5,8,8,5,0,100.0,0.0,0.0,100.0,0.0,38.46,61.54,61.54,38.46,0.0

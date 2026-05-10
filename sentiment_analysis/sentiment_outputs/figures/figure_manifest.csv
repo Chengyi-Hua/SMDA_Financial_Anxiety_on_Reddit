@@ -1,0 +1,12 @@
+﻿figure,purpose
+01_main_text_sentiment_full_sample,Main community-year comparison of multilingual text sentiment.
+01_main_text_sentiment_balanced_sample,Balanced-sample robustness version of the main comparison.
+02_xlm_label_shares_full_sample,Shows negative/neutral/positive shares by community-year.
+02_xlm_label_shares_balanced_sample,Balanced-sample version of sentiment-label shares.
+03_pooled_text_sentiment_by_year,Pooled year-level overview; should be interpreted cautiously.
+04_emoji_share_by_group,Shows how much emoji usage increased from 2020 to 2025.
+05_emoji_affect_distribution,"Shows whether mapped emojis are positive, negative, or neutral/mixed."
+06_mean_emoji_sentiment_score,Shows mean explicit emoji affect score.
+07_vader_vs_xlm_method_comparison,Shows difference between VADER baseline and XLM-R main method.
+08_full_vs_balanced_sentiment,Checks whether unequal group sizes drive the result.
+09_text_sentiment_vs_emoji_affect,Shows text sentiment and emoji affect as separate signals.
