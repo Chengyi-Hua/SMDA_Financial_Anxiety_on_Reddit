@@ -52,3 +52,6 @@ NER_DICT = {
 
 # Analysis parameters
 SAMPLE_SIZE = int(os.getenv('SAMPLE_SIZE'))
+
+# LLM key
+HUGGING_FACE_API_KEY = os.getenv('HUGGING_FACE_API_KEY')
