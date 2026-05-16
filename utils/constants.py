@@ -40,18 +40,40 @@ NER_DICT = {
   "PERSON": "PERSON",
   "ORDINAL": "ORDINAL",
 }
-# NER_DICT_DE = {
-#   "TIME": "TIME",
-#   "CARDINAL": "CARDINAL",
-#   "ORG": "ORG",
-#   "MONEY": "MONEY",
-#   "LOC": "GPE",
-#   "PER": "PERSON",
-#   "ORDINAL": "ORDINAL"
-# }
 
 # Analysis parameters
 SAMPLE_SIZE = int(os.getenv('SAMPLE_SIZE'))
 
 # LLM key
 HUGGING_FACE_API_KEY = os.getenv('HUGGING_FACE_API_KEY')
+
+# HPC GPU optimization parameters
+RANDOM_STATE = 42
+EMBEDDING_MODEL_NAME = os.getenv('EMBEDDING_MODEL_NAME')
+QWEN_MODEL_ID = os.getenv('QWEN_MODEL_ID')
+TARGET_TOPIC_MIN = 10
+TARGET_TOPIC_MAX = 15
+
+# HPC GPU optimization parameters (can be overridden via env)
+GPU_DEVICE = int(os.getenv("CUDA_VISIBLE_DEVICES", "0").split(",")[0])
+BATCH_SIZE_EMBEDDING = 128
+UMAP_N_JOBS = -1
+EMBEDDING_SHOW_PROGRESS = True
+
+# Lightweight German stopword list to avoid a spaCy dependency.
+GERMAN_STOP_WORDS = {
+  "aber", "als", "am", "an", "auch", "auf", "aus", "bei", "bin", "bis",
+  "bist", "da", "dadurch", "daher", "darum", "das", "daß", "dass", "dein",
+  "deine", "dem", "den", "der", "des", "dessen", "deshalb", "die", "dies",
+  "dieser", "dieses", "doch", "dort", "du", "durch", "ein", "eine", "einem",
+  "einen", "einer", "eines", "er", "es", "euer", "eure", "für", "hat", "hatte",
+  "haben", "heute", "hier", "hinter", "ich", "ihr", "ihre", "im", "in", "ist",
+  "ja", "jede", "jedem", "jeden", "jeder", "jedes", "jener", "jenes", "jetzt",
+  "kann", "kannst", "können", "könnt", "man", "mehr", "mit", "muss", "musst",
+  "müssen", "müsst", "nach", "nicht", "nichts", "noch", "nun", "nur", "ob", "oder",
+  "ohne", "sehr", "sein", "seine", "sich", "sie", "sind", "so", "solche", "solcher",
+  "sondern", "stark", "sowie", "um", "und", "uns", "unser", "unter", "vom", "von",
+  "vor", "wann", "war", "waren", "warst", "was", "weg", "weil", "weiter", "welche",
+  "welchem", "welchen", "welcher", "welches", "wenn", "wer", "werde", "werden",
+  "wie", "wieder", "wir", "wird", "wirst", "wo", "zu", "zum", "zur", "über",
+}
