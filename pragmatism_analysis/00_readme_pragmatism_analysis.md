@@ -119,7 +119,7 @@ The eight structural-pragmatism categories are not adopted from a single standar
 
 The framework is grounded in adjacent literatures on economic policy uncertainty, financial capability, household finance, investment behavior, mental accounting, financial literacy, risk perception, and financial well-being. These literatures support the conceptual dimensions behind the categories, while the exact category names are study-specific.
 
-The papers listed below should therefore be read as **conceptual grounding**, not as direct sources of the exact category labels.
+The papers listed below should therefore be read as **conceptual grounding**, not as direct sources of the exact category labels. The usable papers are within our google drive folder
 
 | Operational category | Status | Conceptual grounding | How this supports the category |
 |---|---|---|---|
