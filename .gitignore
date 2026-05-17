@@ -39,6 +39,9 @@ data/*.csv
 data/*_final.csv
 data/*_with_emo.csv
 
+*.csv
+*.png
+*.xlsx
 # Environments/cache
 .venv/
 .venv_sentiment/
@@ -46,3 +49,4 @@ venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/
+sentiment_analysis/external/GerVADER/
