@@ -1,0 +1,4 @@
+﻿test,community,table,chi2,p_value,dof,cramers_v
+sentiment_label_distribution_by_year,finanzen,"{'negative': {2020: 1460, 2025: 8639}, 'neutral': {2020: 3071, 2025: 13216}, 'positive': {2020: 123, 2025: 814}}",95.82250025594391,1.5574296854829041e-21,2,0.0592201575156443
+sentiment_label_distribution_by_year,personalfinance,"{'negative': {2020: 63081, 2025: 43312}, 'neutral': {2020: 38107, 2025: 27859}, 'positive': {2020: 2004, 2025: 1555}}",47.22433469652272,5.5637295995755766e-11,2,0.01638429597330569
+sentiment_label_distribution_by_year,pooled_composition_sensitive,"{'negative': {2020: 64541, 2025: 51951}, 'neutral': {2020: 41178, 2025: 41075}, 'positive': {2020: 2127, 2025: 2369}}",613.3585238661409,6.4697697990294e-134,2,0.05493530511764174

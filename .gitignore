@@ -15,8 +15,38 @@ dist/
 build/
 site/
 
+
 # Local notebook/editor state
 .vscode/
 
 asset/
 result*/
+
+
+# Row-level sentiment outputs with Reddit text
+sentiment_analysis/sentiment_outputs/sentiment_scored_posts_full.csv
+sentiment_analysis/sentiment_outputs/sentiment_scored_posts_slim.csv
+sentiment_analysis/sentiment_outputs/sentiment_balanced_sample.csv
+sentiment_analysis/sentiment_outputs/manual_inspection*.csv
+sentiment_analysis/sentiment_outputs/manual_inspection*.xlsx
+sentiment_analysis/sentiment_outputs/for_manual_inspection/manual_inspection*.csv
+sentiment_analysis/sentiment_outputs/for_manual_inspection/manual_inspection*.xlsx
+sentiment_analysis/sentiment_outputs/for_manual_inspection/archive_manual_rating/manual_inspection*.csv
+sentiment_analysis/sentiment_outputs/for_manual_inspection/archive_manual_rating/manual_inspection*.xlsx
+
+# Raw/cleaned Reddit data
+data/*.csv
+data/*_final.csv
+data/*_with_emo.csv
+
+*.csv
+*.png
+*.xlsx
+# Environments/cache
+.venv/
+.venv_sentiment/
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+sentiment_analysis/external/GerVADER/
