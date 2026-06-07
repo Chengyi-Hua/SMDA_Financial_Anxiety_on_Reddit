@@ -88,3 +88,6 @@ wasabi==1.1.3
 wcwidth==0.7.0
 weasel==1.0.0
 wrapt==2.1.2
+
+transformers>=4.30.0
+torch>=2.0.0
