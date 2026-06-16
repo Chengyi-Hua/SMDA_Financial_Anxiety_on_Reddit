@@ -41,6 +41,9 @@ data/*_with_emo.csv
 
 *.csv
 *.png
+*.jpg
+*.svg
+*.pdf
 *.xlsx
 # Environments/cache
 .venv/
