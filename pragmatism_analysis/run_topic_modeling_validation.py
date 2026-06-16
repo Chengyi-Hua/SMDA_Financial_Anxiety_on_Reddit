@@ -44,7 +44,7 @@ class Config:
     # Set to e.g. 2000 for testing. Keep None for final run.
     max_docs_per_group: int | None = None
 
-    use_sentence_transformers_if_available: bool = False
+    use_sentence_transformers_if_available: bool = True
     embedding_model_name: str = "sentence-transformers/paraphrase-multilingual-mpnet-base-v2"
 
     @property
@@ -241,6 +241,7 @@ TOPIC_NOISE_STOPWORDS = {
     "sollte", "sollten", "müsste", "muesste",
     "nun", "warum", "vielleicht", "eigentlich", "ziemlich",
     "einfach", "wirklich", "aktuell", "aktuell", "aktuelle",
+    "dazu", "ohne", "dank", "zeit", "thema", "themen",
 
     # ----------------------------
     # German community/discussion artifacts
@@ -377,6 +378,23 @@ def build_text_column(df: pd.DataFrame) -> pd.Series:
 def make_topic_label(topic_terms: list[str], topic_id: int, n: int = 5) -> str:
     return f"T{topic_id}: " + ", ".join(topic_terms[:n])
 
+def short_topic_terms(topic_label: str, n_terms: int = 3) -> str:
+    """
+    Extracts the first n topic terms from labels like:
+    'T18: tax, taxes, file, income, return'
+    """
+    if pd.isna(topic_label):
+        return ""
+
+    label = str(topic_label)
+
+    if ":" in label:
+        label = label.split(":", 1)[1]
+
+    terms = [term.strip() for term in label.split(",") if term.strip()]
+
+    return ", ".join(terms[:n_terms])
+
 
 def bh_adjust(p_values: pd.Series) -> pd.Series:
     p = pd.to_numeric(p_values, errors="coerce").to_numpy(dtype=float)
@@ -499,7 +517,7 @@ def fit_kmeans_topic_model(df: pd.DataFrame):
 
     texts_global = df["topic_model_text"].tolist()
 
-    print("Building TF-IDF matrix...")
+    print("Building matrix...")
     vectorizer, tfidf_matrix = build_tfidf_matrix(texts_global)
 
     clustering_matrix, clustering_source = get_clustering_matrix(tfidf_matrix)
@@ -1101,6 +1119,379 @@ def plot_mapped_category_profile_by_year(
 
     save_figure(fig, f"{filename_prefix}_topic_mapped_category_profile_{year}.png")
 
+def plot_topic_driver_bubble_chart(
+    prevalence: pd.DataFrame,
+    mapping: pd.DataFrame,
+    year: int,
+    filename_prefix: str,
+    top_n: int = 16,
+) -> None:
+    """
+    Slide-friendly topic-driver plot.
+
+    Each bubble is one KMeans topic.
+    X-axis = difference in topic share: finanzen minus personalfinance.
+    Y-axis = mapped structural category.
+    Bubble size = average topic prevalence across the two communities.
+    Label = topic ID.
+
+    This is easier to interpret than a 2D cluster projection because the
+    x-axis has direct substantive meaning.
+    """
+
+    df = prevalence[prevalence["year"].eq(year)].copy()
+
+    pivot = (
+        df.pivot_table(
+            index=["topic", "topic_label"],
+            columns="community",
+            values="share",
+            fill_value=0,
+        )
+        .reset_index()
+    )
+
+    for community in COMMUNITY_ORDER:
+        if community not in pivot.columns:
+            pivot[community] = 0.0
+
+    pivot["difference_finanzen_minus_personalfinance"] = (
+        pivot["finanzen"] - pivot["personalfinance"]
+    )
+
+    pivot["mean_topic_share"] = (
+        pivot["finanzen"] + pivot["personalfinance"]
+    ) / 2
+
+    pivot = pivot.merge(
+        mapping[
+            [
+                "topic",
+                "mapped_structural_category",
+                "mapped_structural_category_label",
+                "topic_n_posts",
+                "matched_seed_terms",
+            ]
+        ],
+        on="topic",
+        how="left",
+    )
+
+    # Keep only mapped topics for a cleaner presentation visual.
+    pivot = pivot[
+        pivot["mapped_structural_category"].notna()
+        & (pivot["mapped_structural_category"] != "unmapped_or_general")
+    ].copy()
+
+    # Keep the strongest topic drivers.
+    pivot = (
+        pivot.reindex(
+            pivot["difference_finanzen_minus_personalfinance"]
+            .abs()
+            .sort_values(ascending=False)
+            .index
+        )
+        .head(top_n)
+        .copy()
+    )
+
+    # Category order on y-axis.
+    category_order = [
+        category
+        for category in CATEGORY_ORDER
+        if category in pivot["mapped_structural_category"].unique()
+    ]
+
+    category_to_y = {
+        category: i
+        for i, category in enumerate(category_order)
+    }
+
+    pivot["y_base"] = pivot["mapped_structural_category"].map(category_to_y)
+
+    # Small vertical jitter within category rows to avoid overlap.
+    pivot = pivot.sort_values(
+        ["mapped_structural_category", "difference_finanzen_minus_personalfinance"]
+    ).copy()
+
+    offsets = []
+    for _, group in pivot.groupby("mapped_structural_category", sort=False):
+        n = len(group)
+        if n == 1:
+            offsets.extend([0.0])
+        else:
+            offsets.extend(np.linspace(-0.18, 0.18, n))
+
+    pivot["y"] = pivot["y_base"] + offsets
+
+    # Bubble size.
+    max_share = max(float(pivot["mean_topic_share"].max()), 0.001)
+    pivot["bubble_size"] = 350 + 2200 * (pivot["mean_topic_share"] / max_share)
+
+    pivot["topic_display"] = "T" + pivot["topic"].astype(int).astype(str)
+
+    save_table(
+        pivot[
+            [
+                "topic",
+                "topic_label",
+                "mapped_structural_category",
+                "mapped_structural_category_label",
+                "finanzen",
+                "personalfinance",
+                "difference_finanzen_minus_personalfinance",
+                "mean_topic_share",
+                "topic_n_posts",
+                "matched_seed_terms",
+            ]
+        ],
+        f"{filename_prefix}_topic_driver_bubble_{year}_data.csv",
+    )
+
+    fig, ax = plt.subplots(figsize=(14, 8))
+
+    cmap = plt.get_cmap("tab20")
+
+    for i, category in enumerate(category_order):
+        subset = pivot[pivot["mapped_structural_category"] == category]
+
+        ax.scatter(
+            subset["difference_finanzen_minus_personalfinance"],
+            subset["y"],
+            s=subset["bubble_size"],
+            alpha=0.72,
+            color=cmap(i),
+            edgecolor="black",
+            linewidth=0.7,
+            label=CATEGORY_LABELS.get(category, category),
+        )
+
+        for _, row in subset.iterrows():
+            ax.text(
+                row["difference_finanzen_minus_personalfinance"],
+                row["y"],
+                row["topic_display"],
+                ha="center",
+                va="center",
+                fontsize=10,
+                weight="bold",
+            )
+
+    year_label = "2020 crisis year" if year == 2020 else str(year)
+
+    ax.axvline(0, color="black", linewidth=1)
+
+    ax.set_title(
+        f"Topic drivers of community differences, {year_label}",
+        fontsize=18,
+    )
+
+    ax.set_xlabel(
+        "Difference in topic share: finanzen minus personalfinance",
+        fontsize=14,
+    )
+
+    ax.set_ylabel("Mapped structural category", fontsize=14)
+
+    ax.set_yticks(range(len(category_order)))
+    ax.set_yticklabels(
+        [CATEGORY_LABELS.get(category, category) for category in category_order],
+        fontsize=12,
+    )
+
+    ax.tick_params(axis="x", labelsize=12)
+    ax.xaxis.set_major_formatter(PercentFormatter(1.0))
+    ax.grid(axis="x", alpha=0.25)
+    ax.grid(axis="y", alpha=0.10)
+
+    max_abs = max(
+        float(np.nanmax(np.abs(pivot["difference_finanzen_minus_personalfinance"]))),
+        0.01,
+    )
+
+    ax.set_xlim(-max_abs * 1.35, max_abs * 1.35)
+
+    ax.text(
+        0.01,
+        0.02,
+        "Left = higher in personalfinance\nRight = higher in finanzen\nBubble size = average topic prevalence",
+        transform=ax.transAxes,
+        ha="left",
+        va="bottom",
+        fontsize=10,
+        bbox=dict(boxstyle="round", alpha=0.08),
+    )
+
+    # Category labels are already on y-axis, so no legend is needed.
+    # Keeping the legend off makes the slide cleaner.
+
+    save_figure(fig, f"{filename_prefix}_topic_driver_bubble_{year}.png")
+
+
+
+def make_topic_driver_label_table(
+    prevalence: pd.DataFrame,
+    mapping: pd.DataFrame,
+    year: int,
+    filename_prefix: str,
+    top_n: int = 12,
+    n_terms: int = 3,
+) -> None:
+    """
+    Creates a slide-friendly topic key table for the topic-driver bubble chart.
+
+    The table explains what T0, T1, T2, etc. mean.
+    """
+
+    df = prevalence[prevalence["year"].eq(year)].copy()
+
+    pivot = (
+        df.pivot_table(
+            index=["topic", "topic_label"],
+            columns="community",
+            values="share",
+            fill_value=0,
+        )
+        .reset_index()
+    )
+
+    for community in COMMUNITY_ORDER:
+        if community not in pivot.columns:
+            pivot[community] = 0.0
+
+    pivot["difference_finanzen_minus_personalfinance"] = (
+        pivot["finanzen"] - pivot["personalfinance"]
+    )
+
+    pivot["mean_topic_share"] = (
+        pivot["finanzen"] + pivot["personalfinance"]
+    ) / 2
+
+    pivot = pivot.merge(
+        mapping[
+            [
+                "topic",
+                "mapped_structural_category",
+                "mapped_structural_category_label",
+            ]
+        ],
+        on="topic",
+        how="left",
+    )
+
+    # Keep only mapped topics, same logic as the bubble chart.
+    pivot = pivot[
+        pivot["mapped_structural_category"].notna()
+        & (pivot["mapped_structural_category"] != "unmapped_or_general")
+    ].copy()
+
+    # Keep strongest topic drivers by absolute community difference.
+    pivot = (
+        pivot.reindex(
+            pivot["difference_finanzen_minus_personalfinance"]
+            .abs()
+            .sort_values(ascending=False)
+            .index
+        )
+        .head(top_n)
+        .copy()
+    )
+
+    pivot["topic_id"] = "T" + pivot["topic"].astype(int).astype(str)
+    pivot["top_terms"] = pivot["topic_label"].map(
+        lambda x: short_topic_terms(x, n_terms=n_terms)
+    )
+
+    pivot["higher_in"] = np.where(
+        pivot["difference_finanzen_minus_personalfinance"] > 0,
+        "finanzen",
+        "personalfinance",
+    )
+
+    pivot["difference_pp"] = (
+        pivot["difference_finanzen_minus_personalfinance"] * 100
+    ).round(1)
+
+    out = pivot[
+        [
+            "topic_id",
+            "top_terms",
+            "mapped_structural_category_label",
+            "higher_in",
+            "difference_pp",
+            "finanzen",
+            "personalfinance",
+            "topic_label",
+        ]
+    ].copy()
+
+    out = out.rename(
+        columns={
+            "topic_id": "Topic",
+            "top_terms": "Top terms",
+            "mapped_structural_category_label": "Mapped category",
+            "higher_in": "Higher in",
+            "difference_pp": "Difference, pp",
+            "finanzen": "finanzen share",
+            "personalfinance": "personalfinance share",
+            "topic_label": "Full topic label",
+        }
+    )
+
+    save_table(
+        out,
+        f"{filename_prefix}_topic_driver_key_{year}.csv",
+    )
+
+    # Presentation-ready PNG table.
+    display = out[
+        [
+            "Topic",
+            "Top terms",
+            "Mapped category",
+            "Higher in",
+            "Difference, pp",
+        ]
+    ].copy()
+
+    display["Difference, pp"] = display["Difference, pp"].map(
+        lambda x: f"{x:+.1f}"
+    )
+
+    year_label = "2020 crisis year" if year == 2020 else str(year)
+
+    fig_height = 0.55 + 0.45 * len(display)
+    fig, ax = plt.subplots(figsize=(14, fig_height))
+    ax.axis("off")
+
+    table = ax.table(
+        cellText=display.values,
+        colLabels=display.columns,
+        cellLoc="left",
+        colLoc="left",
+        loc="center",
+    )
+
+    table.auto_set_font_size(False)
+    table.set_fontsize(10)
+    table.scale(1, 1.35)
+
+    # Header styling and light row spacing.
+    for (row, col), cell in table.get_celld().items():
+        if row == 0:
+            cell.set_text_props(weight="bold")
+            cell.set_height(cell.get_height() * 1.15)
+        if col == 0:
+            cell.set_text_props(weight="bold")
+
+    ax.set_title(
+        f"Topic key for topic-driver plot, {year_label}",
+        fontsize=16,
+        weight="bold",
+        pad=14,
+    )
+
+    save_figure(fig, f"{filename_prefix}_topic_driver_key_{year}.png")
 
 # ============================================================
 # 11. MAIN
@@ -1158,15 +1549,49 @@ def main() -> None:
     )
 
     plot_mapped_category_profile_by_year(
-        mapped_prev=mapped_prevalence,
-        year=2020,
-        filename_prefix="03",
+    mapped_prev=mapped_prevalence,
+    year=2020,
+    filename_prefix="03",
     )
 
     plot_mapped_category_profile_by_year(
         mapped_prev=mapped_prevalence,
         year=2025,
         filename_prefix="04",
+    )
+
+    plot_topic_driver_bubble_chart(
+        prevalence=prevalence,
+        mapping=mapping,
+        year=2020,
+        filename_prefix="05",
+        top_n=16,
+    )
+
+    plot_topic_driver_bubble_chart(
+        prevalence=prevalence,
+        mapping=mapping,
+        year=2025,
+        filename_prefix="06",
+        top_n=16,
+    )
+
+    make_topic_driver_label_table(
+        prevalence=prevalence,
+        mapping=mapping,
+        year=2020,
+        filename_prefix="07",
+        top_n=12,
+        n_terms=3,
+    )
+
+    make_topic_driver_label_table(
+        prevalence=prevalence,
+        mapping=mapping,
+        year=2025,
+        filename_prefix="08",
+        top_n=12,
+        n_terms=3,
     )
 
     summary_path = CFG.output_dir / "topic_modeling_validation_summary.md"
@@ -1181,8 +1606,10 @@ def main() -> None:
         f.write("## Purpose\n\n")
         f.write(
             "This model is used as an inductive validation layer for the structural "
-            "pragmatism categories. It avoids BERTopic/HDBSCAN and therefore does "
-            "not require Microsoft C++ Build Tools.\n\n"
+            "pragmatism categories. When available, it clusters posts using multilingual "
+            "sentence-transformer embeddings to reduce German-English vocabulary confounding. "
+            "TF-IDF is retained for topic-term labeling. It avoids BERTopic/HDBSCAN and "
+            "therefore does not require Microsoft C++ Build Tools.\n\n"
         )
         f.write("## Most important files\n\n")
         f.write("- `tables/topic_model_topic_info.csv`\n")
@@ -1192,6 +1619,10 @@ def main() -> None:
         f.write("- `figures/02_topic_differences_2025.png`\n")
         f.write("- `figures/03_topic_mapped_category_profile_2020.png`\n")
         f.write("- `figures/04_topic_mapped_category_profile_2025.png`\n")
+        f.write("- `figures/05_topic_driver_bubble_2020.png`\n")
+        f.write("- `figures/06_topic_driver_bubble_2025.png`\n")
+        f.write("- `figures/07_topic_driver_key_2020.png`\n")
+        f.write("- `figures/08_topic_driver_key_2025.png`\n")
 
     print(f"Saved summary: {summary_path}")
 

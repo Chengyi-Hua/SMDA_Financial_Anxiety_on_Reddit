@@ -10,12 +10,21 @@ import pandas as pd
 PROJECT_DIR = Path(r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis")
 
 # Main sentiment output folder
-OUTPUT_DIR = PROJECT_DIR  / "sentiment_outputs" 
+OUTPUT_DIR = PROJECT_DIR  / "manual_inspection" 
 
 INPUT_FILE = OUTPUT_DIR / "sentiment_scored_posts_slim.csv"
 
 OUTPUT_CSV = OUTPUT_DIR / "manual_inspection_compact_sample.csv"
 OUTPUT_XLSX = OUTPUT_DIR / "manual_inspection_compact_sample.xlsx"
+
+BLINDED_CSV = OUTPUT_DIR / "manual_inspection_blinded.csv"
+BLINDED_XLSX = OUTPUT_DIR / "manual_inspection_blinded.xlsx"
+
+ANSWER_KEY_CSV = OUTPUT_DIR / "manual_inspection_answer_key.csv"
+ANSWER_KEY_XLSX = OUTPUT_DIR / "manual_inspection_answer_key.xlsx"
+
+FULL_INTERNAL_CSV = OUTPUT_DIR / "manual_inspection_internal_full.csv"
+
 
 RANDOM_SEED = 42
 
@@ -160,63 +169,142 @@ manual_sample = manual_sample.drop_duplicates(
 
 # Add short text for easier manual inspection
 manual_sample["short_text"] = manual_sample[TEXT_COL].apply(make_short_text)
+#
+# CREATE BLINDED + ANSWER-KEY FILES
+#
 
-# Add blank columns for manual coding
-manual_sample["manual_assessment"] = ""
-manual_sample["manual_notes"] = ""
+# Randomize row order so the annotator cannot infer sampling type from order
+manual_sample = manual_sample.sample(
+    frac=1,
+    random_state=RANDOM_SEED
+).reset_index(drop=True)
 
-# Keep only necessary columns
-front_cols = [
-    "sample_type",
-    "manual_assessment",
-    "manual_notes",
+# Anonymous ID used to merge annotations later
+manual_sample["inspection_id"] = [
+    f"MI_{i:04d}" for i in range(1, len(manual_sample) + 1)
+]
+
+# Save full internal version for reproducibility only
+manual_sample.to_csv(FULL_INTERNAL_CSV, index=False, encoding="utf-8-sig")
+
+
+#
+# 1. BLINDED FILE FOR ANNOTATOR
+#
+
+# Important:
+# Do NOT include model scores, model labels, sample_type, community, or year.
+# sample_type is revealing because labels like "most_negative_xlm"
+# tell the annotator what the model predicted.
+
+blinded = manual_sample.copy()
+
+blinded["manual_text_sentiment"] = ""
+blinded["manual_text_sentiment_notes"] = ""
+blinded["manual_emoji_function"] = ""
+blinded["manual_emoji_notes"] = ""
+
+blinded_cols = [
+    "inspection_id",
+
+    # Manual annotation fields
+    "manual_text_sentiment",
+    "manual_text_sentiment_notes",
+    "manual_emoji_function",
+    "manual_emoji_notes",
+
+    # Text shown to annotator
+    "short_text",
+    TEXT_NO_EMOJI_COL,
+    TEXT_COL,
+
+    # Emoji context
+    "has_emoji",
+    "emoji_count",
+    "emojis_extracted",
+]
+
+blinded_cols = [c for c in blinded_cols if c in blinded.columns]
+blinded = blinded[blinded_cols]
+
+blinded.to_csv(BLINDED_CSV, index=False, encoding="utf-8-sig")
+
+try:
+    with pd.ExcelWriter(BLINDED_XLSX, engine="openpyxl") as writer:
+        blinded.to_excel(writer, index=False, sheet_name="annotation")
+
+        codebook = pd.DataFrame({
+            "field": [
+                "manual_text_sentiment",
+                "manual_emoji_function",
+            ],
+            "allowed_values": [
+                "negative / neutral_or_mixed / positive / unclear",
+                "positive_or_softening / negative / neutral / no_emoji / unclear",
+            ],
+            "instruction": [
+                "Judge the affective tone of the post without seeing model outputs.",
+                "Judge how emojis function in context, not whether the post itself is anxious.",
+            ],
+        })
+
+        codebook.to_excel(writer, index=False, sheet_name="codebook")
+
+    print(f"Saved blinded Excel file: {BLINDED_XLSX}")
+
+except Exception as e:
+    print("Blinded Excel export skipped. Install openpyxl if needed:")
+    print("python -m pip install openpyxl")
+    print(f"Reason: {e}")
+
+print(f"Saved blinded CSV file: {BLINDED_CSV}")
+
+
+#
+# 2. ANSWER KEY FOR LATER ANALYSIS
+#
+
+answer_key_cols = [
+    "inspection_id",
     "analysis_id",
+    "sample_type",
     "community",
     "year",
     "title",
     "url",
+
     MAIN_SCORE,
     MAIN_LABEL,
     VADER_SCORE,
     VADER_LABEL,
+
     "has_emoji",
     "emoji_count",
     "emojis_extracted",
     EMOJI_SCORE,
     EMOJI_LABEL,
-    "short_text",
-    TEXT_COL,
-    TEXT_NO_EMOJI_COL,
+
     "language_confidence",
     "word_count",
 ]
 
-front_cols = [c for c in front_cols if c in manual_sample.columns]
+answer_key_cols = [c for c in answer_key_cols if c in manual_sample.columns]
+answer_key = manual_sample[answer_key_cols]
 
-manual_sample = manual_sample[front_cols]
+answer_key.to_csv(ANSWER_KEY_CSV, index=False, encoding="utf-8-sig")
 
-# Save CSV
-manual_sample.to_csv(OUTPUT_CSV, index=False, encoding="utf-8-sig")
-
-# Save Excel version
 try:
-    with pd.ExcelWriter(OUTPUT_XLSX, engine="openpyxl") as writer:
-        manual_sample.to_excel(writer, index=False, sheet_name="all_samples")
-
-        for sample_type, subset in manual_sample.groupby("sample_type"):
-            sheet_name = sample_type[:31]
-            subset.to_excel(writer, index=False, sheet_name=sheet_name)
-
-    print(f"Saved Excel file: {OUTPUT_XLSX}")
+    answer_key.to_excel(ANSWER_KEY_XLSX, index=False)
+    print(f"Saved answer-key Excel file: {ANSWER_KEY_XLSX}")
 
 except Exception as e:
-    print("Excel export skipped. Install openpyxl if needed:")
-    print("python -m pip install openpyxl")
+    print("Answer-key Excel export skipped.")
     print(f"Reason: {e}")
 
-print(f"Saved CSV file: {OUTPUT_CSV}")
+print(f"Saved answer-key CSV file: {ANSWER_KEY_CSV}")
+
 print()
-print("Sample counts:")
+print("Internal sample counts:")
 print(manual_sample.groupby(["sample_type", "community", "year"]).size())
 print()
 print(f"Total rows: {len(manual_sample)}")
