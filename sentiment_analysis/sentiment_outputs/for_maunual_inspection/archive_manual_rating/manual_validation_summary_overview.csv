@@ -1,4 +1,0 @@
-﻿component_checked,main_count,main_share_percent,main_finding,interpretation
-XLM-RoBERTa text sentiment,51,98.08,Mostly plausible,Suitable as the primary sentiment measure.
-VADER baseline,30,57.69,Frequently misleading,"Useful as a baseline only, not as the main result."
-Emoji sentiment,17,32.69,Useful but context-dependent,"Adds tone information, but symbolic emojis require caution."

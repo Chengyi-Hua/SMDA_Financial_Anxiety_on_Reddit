@@ -22,6 +22,33 @@ personalfinance = product-, institution-, budgeting-, and problem-solving pragma
 finanzen = investment-, market-, and macro-context pragmatism
 ```
 
+## 1.1 Analytical Workflow
+
+The structural pragmatism analysis follows a multi-step workflow.
+
+```text
+Cleaned Reddit posts
+        ↓
+Community/year identification
+        ↓
+Language-confidence filtering
+        ↓
+Bilingual lexicon-based pragmatism scoring
+        ↓
+Post-level pragmatism variables
+        ↓
+Community-year summaries
+        ↓
+Balanced 2 × 2 sample
+        ↓
+Statistical tests
+        ↓
+Story visualizations
+        ↓
+Topic-modeling validation
+```
+
+
 ---
 
 ## 2. Definition of Structural Pragmatism
@@ -529,7 +556,29 @@ Because HDBSCAN-based BERTopic could not be run reliably in the local Windows en
 
 ---
 
-### 11.1 Topic-Derived Category Profile, 2020 Crisis Year
+### 11.1 Topic-to-Category Mapping: How It Works
+
+After the KMeans topic model assigns posts to topics, each discovered topic is compared with each of the eight structural-pragmatism categories. The goal is to determine whether a data-driven topic can be meaningfully interpreted as one of the predefined pragmatism categories.
+
+The mapping uses three signals:
+
+| Signal | Meaning | Weight |
+|---|---|---:|
+| Category presence lift | Are posts in this topic more likely than average to contain this pragmatism category? | 0.50 |
+| Category rate/count lift | Do posts in this topic use more terms from this category than average? | 0.30 |
+| Seed-keyword overlap | Do the topic’s top terms overlap with category seed terms? | 0.20 |
+
+The combined alignment score is:
+
+```text
+combined_alignment_score =
+0.50 × presence_component
++ 0.30 × rate_component
++ 0.20 × keyword_component
+
+```
+
+### 11.2 Topic-Derived Category Profile, 2020 Crisis Year
 
 In the 2020 crisis-year comparison, the topic model reproduces the main community contrast.
 
@@ -549,7 +598,7 @@ This supports the main lexicon-based finding that the community difference was a
 
 ---
 
-### 11.2 Topic-Derived Category Profile, 2025
+### 11.3 Topic-Derived Category Profile, 2025
 
 The same broad contrast is visible in 2025.
 
@@ -567,7 +616,7 @@ Interpretation:
 
 ---
 
-### 11.3 Representative Topics
+### 11.4 Representative Topics
 
 The topic model also produced interpretable topic examples that match the category-level story.
 
@@ -583,7 +632,7 @@ These topic examples show that the topic model broadly recovers the same substan
 
 ---
 
-### 11.4 Interpretation of the Topic-Modeling Validation
+### 11.5 Interpretation of the Topic-Modeling Validation
 
 The topic model supports the main finding:
 
@@ -601,7 +650,7 @@ In other words:
 
 ---
 
-### 11.5 Limitations of the Topic Model
+### 11.6 Limitations of the Topic Model
 
 The topic-modeling results should be interpreted as exploratory.
 
