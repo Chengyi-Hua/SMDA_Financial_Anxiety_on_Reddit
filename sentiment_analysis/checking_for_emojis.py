@@ -2,7 +2,7 @@ import pandas as pd
 import re
 from pathlib import Path
 
-DATA_DIR = Path(r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\data")
+DATA_DIR = Path(r"SMDA_Financial_Anxiety_on_Reddit\data")
 
 files = [
     "finanzen_2020_final.csv",

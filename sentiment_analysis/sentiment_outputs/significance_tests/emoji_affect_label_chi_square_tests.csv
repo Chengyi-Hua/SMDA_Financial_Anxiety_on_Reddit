@@ -1,4 +1,0 @@
-﻿test,community,n_emoji_posts,table,chi2,p_value,dof,cramers_v
-emoji_affect_label_distribution_by_year_among_emoji_posts,finanzen,1586,"{'negative': {2020: 0, 2025: 60}, 'neutral_or_mixed': {2020: 0, 2025: 19}, 'positive': {2020: 37, 2025: 1173}, 'unmapped_only': {2020: 14, 2025: 283}}",4.863479344727465,0.18207118996005475,3,0.055376046468909056
-emoji_affect_label_distribution_by_year_among_emoji_posts,personalfinance,2604,"{'negative': {2020: 95, 2025: 322}, 'neutral_or_mixed': {2020: 13, 2025: 31}, 'positive': {2020: 415, 2025: 1133}, 'unmapped_only': {2020: 162, 2025: 433}}",3.3719821569644437,0.3377490666799223,3,0.035985052777672076
-emoji_affect_label_distribution_by_year_among_emoji_posts,pooled_composition_sensitive,4190,"{'negative': {2020: 95, 2025: 382}, 'neutral_or_mixed': {2020: 13, 2025: 50}, 'positive': {2020: 452, 2025: 2306}, 'unmapped_only': {2020: 176, 2025: 716}}",7.756462428499734,0.05132238499896785,3,0.043025391927061674

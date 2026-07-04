@@ -1,24 +1,16 @@
-# visualize_pragmatism_story_figures.py
-
 from __future__ import annotations
-
 from dataclasses import dataclass
 from pathlib import Path
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
 
 
-# ============================================================
-# 1. CONFIGURATION
-# ============================================================
-
 @dataclass(frozen=True)
 class VizConfig:
     project_dir: Path = Path(
-        r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit"
+        r"SMDA_Financial_Anxiety_on_Reddit"
     )
 
     @property
@@ -39,16 +31,12 @@ CFG.figure_dir.mkdir(parents=True, exist_ok=True)
 CFG.figure_data_dir.mkdir(parents=True, exist_ok=True)
 
 
-# ============================================================
-# 2. LABELS AND CONSTANTS
-# ============================================================
-
 COMMUNITY_ORDER = ["finanzen", "personalfinance"]
 YEAR_ORDER = [2020, 2025]
 
 COMMUNITY_LABELS = {
-    "finanzen": "finanzen",
-    "personalfinance": "personalfinance",
+    "finanzen": "German",
+    "personalfinance": "English",
 }
 
 CATEGORY_ORDER = [
@@ -112,9 +100,6 @@ plt.rcParams.update(
     }
 )
 
-# ============================================================
-# 3. HELPERS
-# ============================================================
 
 def require_file(path: Path) -> Path:
     if not path.exists():
@@ -202,31 +187,25 @@ def clean_category_var_name(variable: str) -> str:
     )
 
 
-# ============================================================
-# 4. LOAD ONLY THE INPUTS NEEDED FOR THE STORY FIGURES
-# ============================================================
-
 def load_story_inputs() -> dict[str, pd.DataFrame]:
     data = {}
 
-    data["balanced_sample"] = read_csv_required(
-        "pragmatism_balanced_sample.csv"
+    # Full sample for main-text figures
+    data["sample"] = read_csv_required(
+        "pragmatism_scored_posts_slim.csv"
     )
 
-    data["balanced_summary"] = read_csv_required(
-        "pragmatism_group_summary_balanced.csv"
+    data["summary"] = read_csv_required(
+        "pragmatism_group_summary_full_sample.csv"
     )
 
-    data["balanced_categorical_tests"] = read_csv_required(
-        "pragmatism_categorical_statistical_tests_balanced_sample.csv"
+    data["categorical_tests"] = read_csv_required(
+        "pragmatism_categorical_statistical_tests_full_sample.csv"
     )
 
     return data
 
 
-# ============================================================
-# 5. SHARED CATEGORY TABLES
-# ============================================================
 
 def category_presence_table(sample: pd.DataFrame, year: int) -> pd.DataFrame:
     require_columns(
@@ -367,10 +346,6 @@ def dominant_category_profile_by_year(sample: pd.DataFrame, year: int) -> pd.Dat
     return out
 
 
-# ============================================================
-# 6. FIGURE 1: OVERALL STRUCTURAL PRAGMATISM INDEX
-# ============================================================
-
 def plot_category_profile_by_year(sample: pd.DataFrame, year: int) -> None:
     df = dominant_category_profile_by_year(sample, year=year)
 
@@ -388,7 +363,7 @@ def plot_category_profile_by_year(sample: pd.DataFrame, year: int) -> None:
         y - height / 2,
         df["personalfinance"],
         height,
-        label="personalfinance",
+        label=COMMUNITY_LABELS["personalfinance"],
         color=COLOR_PERSONALFINANCE,
     )
 
@@ -396,7 +371,7 @@ def plot_category_profile_by_year(sample: pd.DataFrame, year: int) -> None:
         y + height / 2,
         df["finanzen"],
         height,
-        label="finanzen",
+        label=COMMUNITY_LABELS["finanzen"],
         color=COLOR_FINANZEN,
     )
 
@@ -434,9 +409,6 @@ def plot_category_profile_by_year(sample: pd.DataFrame, year: int) -> None:
     save_figure(fig, f"03_dominant_category_profile_{year}.png")
 
 
-# ============================================================
-# 7. FIGURE 3: CATEGORY PROFILE, 2025
-# ============================================================
 
 def plot_category_profile_2025(sample: pd.DataFrame) -> None:
     df = category_presence_table(sample, year=2025)
@@ -455,7 +427,7 @@ def plot_category_profile_2025(sample: pd.DataFrame) -> None:
     y - height / 2,
     df["personalfinance"],
     height,
-    label="personalfinance",
+    label=COMMUNITY_LABELS["personalfinance"],
     color=COLOR_PERSONALFINANCE,
     )
 
@@ -463,7 +435,7 @@ def plot_category_profile_2025(sample: pd.DataFrame) -> None:
         y + height / 2,
         df["finanzen"],
         height,
-        label="finanzen",
+        label=COMMUNITY_LABELS["finanzen"],
         color=COLOR_FINANZEN,
     )
 
@@ -501,9 +473,6 @@ def plot_category_profile_2025(sample: pd.DataFrame) -> None:
     save_figure(fig, "03_category_profile_2025.png")
 
 
-# ============================================================
-# 8. FIGURE 4: CATEGORY DIFFERENCES, 2025
-# ============================================================
 
 def plot_category_difference_by_year(sample: pd.DataFrame, year: int) -> None:
     df = category_presence_table(sample, year=year)
@@ -522,7 +491,7 @@ def plot_category_difference_by_year(sample: pd.DataFrame, year: int) -> None:
 
     ax.axvline(0, linewidth=1)
     ax.set_title(f"The communities differ in the type of pragmatism they express, {year}")
-    ax.set_xlabel("Difference in share of posts: finanzen minus personalfinance")
+    ax.set_xlabel("Difference in share of posts: German minus English")
     ax.set_yticks(y)
     ax.set_yticklabels(df["category_label"])
     ax.xaxis.set_major_formatter(PercentFormatter(1.0))
@@ -551,7 +520,7 @@ def plot_category_difference_by_year(sample: pd.DataFrame, year: int) -> None:
     ax.text(
         0.99,
         0.02,
-        "Positive = higher in finanzen\nNegative = higher in personalfinance",
+        "Positive = higher in German\nNegative = higher in English",
         transform=ax.transAxes,
         ha="right",
         va="bottom",
@@ -563,9 +532,6 @@ def plot_category_difference_by_year(sample: pd.DataFrame, year: int) -> None:
     save_figure(fig, f"04_category_differences_{year}.png")
 
 
-# ============================================================
-# 9. FIGURE 5: DOMINANT CATEGORY STACKED BARS
-# ============================================================
 def plot_dominant_category_stacked_simplified(sample: pd.DataFrame) -> None:
     long = make_dominant_category_table(sample)
 
@@ -644,6 +610,12 @@ def plot_dominant_category_stacked_simplified(sample: pd.DataFrame) -> None:
         "none": "#F0F0F0",
     }
 
+    GROUP_LABELS = {
+        "finanzen 2020": "German 2020",
+        "finanzen 2025": "German 2025",
+        "personalfinance 2020": "English 2020",
+        "personalfinance 2025": "English 2025",
+    }
     left = np.zeros(len(pivot))
     y = np.arange(len(pivot))
 
@@ -670,7 +642,7 @@ def plot_dominant_category_stacked_simplified(sample: pd.DataFrame) -> None:
 
     ax.set_xlabel("Share of posts")
     ax.set_yticks(y)
-    ax.set_yticklabels(pivot.index)
+    ax.set_yticklabels([GROUP_LABELS[g] for g in pivot.index])
     ax.xaxis.set_major_formatter(PercentFormatter(1.0))
     ax.grid(axis="x", alpha=0.20, color=COLOR_GRID)
 
@@ -684,9 +656,6 @@ def plot_dominant_category_stacked_simplified(sample: pd.DataFrame) -> None:
     save_figure(fig, "05_dominant_category_stacked_simplified_slide.png")
 
 
-# ============================================================
-# 10. FIGURE 8: CATEGORY EFFECT SIZES, 2025
-# ============================================================
 
 def plot_category_effects_by_year(
     categorical_tests: pd.DataFrame,
@@ -816,7 +785,7 @@ def plot_category_difference_2020_2025(sample: pd.DataFrame) -> None:
     )
 
     ax.set_xlabel(
-        "Difference in dominant-category share: finanzen minus personalfinance",
+        "Difference in dominant-category share: German minus English",
         fontsize=15,
     )
 
@@ -834,7 +803,7 @@ def plot_category_difference_2020_2025(sample: pd.DataFrame) -> None:
     ax.text(
         0.01,
         0.02,
-        "Left = higher in personalfinance\nRight = higher in finanzen",
+        "Left = higher in English\nRight = higher in German",
         transform=ax.transAxes,
         ha="left",
         va="bottom",
@@ -847,9 +816,6 @@ def plot_category_difference_2020_2025(sample: pd.DataFrame) -> None:
     save_figure(fig, "04_category_differences_2020_2025_slide.png")
 
 
-# ============================================================
-# 11. COMPACT CATEGORY DEVELOPMENT FIGURE
-# ============================================================
 
 def category_development_table(sample: pd.DataFrame) -> pd.DataFrame:
     rows = []
@@ -947,7 +913,6 @@ def plot_category_development_compact(sample: pd.DataFrame) -> None:
         ax.yaxis.set_major_formatter(PercentFormatter(1.0))
         ax.grid(axis="y", alpha=0.20, color=COLOR_GRID)
 
-        # Avoid overlapping endpoint labels when the two 2025 values are close.
         fin_label_y = finanzen_2025
         pf_label_y = pf_2025
 
@@ -988,7 +953,7 @@ def plot_category_development_compact(sample: pd.DataFrame) -> None:
         ax.text(
             0.03,
             0.04,
-            f"fin: {pp_label(finanzen_change)}\npf: {pp_label(pf_change)}",
+            f"German: {pp_label(finanzen_change)}\nEnglish: {pp_label(pf_change)}",
             transform=ax.transAxes,
             ha="left",
             va="bottom",
@@ -1011,7 +976,6 @@ def plot_category_development_compact(sample: pd.DataFrame) -> None:
         y=0.965,
     )
 
-    # Replaces the legend, so nothing overlaps the panel titles.
     fig.text(
         0.5,
         0.925,
@@ -1044,9 +1008,6 @@ def plot_category_development_compact(sample: pd.DataFrame) -> None:
 
     print(f"Saved figure: {output_path}")
 
-# ============================================================
-# 12. COMPACT STORY KEY-NUMBERS TABLE
-# ============================================================
 
 def make_story_key_number_table(
     summary: pd.DataFrame,
@@ -1187,9 +1148,7 @@ def make_story_key_number_table(
     save_figure_data(out, "00_story_key_numbers.csv")
 
 
-# ============================================================
-# 12. MAIN
-# ============================================================
+
 
 def main() -> None:
     print("=" * 80)
@@ -1198,10 +1157,10 @@ def main() -> None:
 
     inputs = load_story_inputs()
 
-    sample = inputs["balanced_sample"]
-    summary = inputs["balanced_summary"]
-    categorical_tests = inputs["balanced_categorical_tests"]
-
+    sample = inputs["sample"]
+    summary = inputs["summary"]
+    categorical_tests = inputs["categorical_tests"]
+    
     for df in [sample, summary]:
         if "year" in df.columns:
             df["year"] = pd.to_numeric(df["year"], errors="coerce").astype("Int64")

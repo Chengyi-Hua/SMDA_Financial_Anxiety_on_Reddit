@@ -1,0 +1,31 @@
+﻿topic,topic_label,topic_n_posts,mapped_structural_category,mapped_structural_category_label,combined_alignment_score,matched_seed_terms
+17,"T17: etf, etfs, investieren, sparplan, msci",962,investment_strategy,Investment strategy,1.0,a1jx52; aktie; aktien; etf; ftse; invest; msci; portfolio; sparplan; vanguard
+29,"T29: house, home, haus, mortgage, wohnung",958,planning_budgeting_control,Planning / budgeting / control,1.0,buying; eigenkapital; haus; haushaltsbuch; home; house; immobilie; kaufen; property; rent; wohnung
+5,"T5: car, loan, auto, vehicle, pay",854,practical_problem_solving,Practical problem-solving,0.8540642041714763,pay; pay off; paying; payment; payments; repay
+9,"T9: account, bank, card, credit, check",791,financial_institutions_products,Financial institutions / products,1.0,account; bank; bankkonto; brokerage account; credit card; girokonto; konto; payment; payments; paypal
+3,"T3: depot, republic, trade republic, trade, kaufen",788,financial_institutions_products,Financial institutions / products,0.2,broker; depot; flatex; trade republic
+7,"T7: aktien, aktie, stock, verkaufen, broker",748,investment_strategy,Investment strategy,1.0,aktie; aktien; etf; portfolio; stock; stocks
+18,"T18: job, work, debt, savings, car",724,planning_budgeting_control,Planning / budgeting / control,1.0,expense; expenses; home; income; monthly; rent; saving; savings
+24,"T24: invest, investing, investment, investieren, fund",703,investment_strategy,Investment strategy,1.0,index fund; invest; investment; portfolio; stock; stocks; vanguard
+28,"T28: sparplan, depot, zinsen, etf, a1jx52",696,investment_strategy,Investment strategy,0.9111111111111112,a1jx52; dividende; etf; invest; sparplan
+8,"T8: bank, account, konto, girokonto, ing",693,financial_institutions_products,Financial institutions / products,1.0,account; bank; bankkonto; brokerage account; c24; depot; dkb; girokonto; ing; konto; sparkasse
+15,"T15: retirement, employer, pension, ira, rente",682,financial_institutions_products,Financial institutions / products,0.942857142857143,account; brokerage account; ing; ira; versicherung
+25,"T25: credit, debt, loan, pay, card",681,financial_institutions_products,Financial institutions / products,1.0,auto loan; balance; car loan; credit card; debt; home loan; ing; loan; payment; payments; paypal; vehicle loan
+12,"T12: etf, msci, world, etfs, broker",680,investment_strategy,Investment strategy,1.0,a1jx52; aktie; aktien; etf; ftse; invest; msci; vanguard
+10,"T10: insurance, hsa, versicherung, policy, health",666,financial_institutions_products,Financial institutions / products,0.7,hsa; insurance; payment; payments; paypal; versicherung
+20,"T20: mortgage, loan, home, house, rate",658,financial_institutions_products,Financial institutions / products,1.0,auto loan; bank; bankkonto; car loan; credit card; debt; home loan; ing; loan; mortgage; payment; payments; paypal; vehicle loan
+21,"T21: job, studium, gehalt, ausbildung, master",639,macro_economic_context,Macro-economic context,1.0,arbeitsmarkt
+13,"T13: ira, roth, roth ira, traditional, account",632,financial_institutions_products,Financial institutions / products,1.0,account; brokerage account; ira
+11,"T11: credit, card, credit card, cards, score",568,financial_institutions_products,Financial institutions / products,1.0,account; balance; bank; bankkonto; brokerage account; credit card; ing; kredit; kreditkarte; payment; payments; paypal
+16,"T16: usa, world, weiter, msci, inflation",557,macro_economic_context,Macro-economic context,1.0,arbeitsmarkt; inflation; wirtschaft; zinsen
+19,"T19: taxes, tax, file, return, income",547,policy_regulation,Policy / regulation,0.9333333333333333,irs; steuer; tax; taxes
+1,"T1: savings, account, saving, save, savings account",535,financial_institutions_products,Financial institutions / products,0.7781514958961702,account; brokerage account; car loan; credit card; debt; ing; payment; payments; paypal
+14,"T14: deutschland, schweiz, deutschen, deutsche, steuern",525,policy_regulation,Policy / regulation,0.7455447422328269,steuer; steuern
+22,"T22: steuererklärung, steuern, steuer, tax, einkommen",521,policy_regulation,Policy / regulation,1.0,finanzamt; steuer; steuern; tax; taxes
+4,"T4: mom, eltern, house, dad, parents",502,planning_budgeting_control,Planning / budgeting / control,0.5714255735256716,haus; haushaltsbuch; home; house; rent
+6,"T6: rent, apartment, wohnung, lease, house",469,planning_budgeting_control,Planning / budgeting / control,1.0,apartment; home; house; miete; rent; wohnung
+23,"T23: job, unemployment, work, company, pay",469,macro_economic_context,Macro-economic context,0.8333333333333334,unemployment
+27,"T27: gemacht könnt, wöchentliche gemacht, wöchentliche, könnt, gemacht",383,planning_budgeting_control,Planning / budgeting / control,0.2,ausgaben; haushaltsbuch; sparen
+26,"T26: loans, student, loan, student loans, pay",362,financial_institutions_products,Financial institutions / products,1.0,auto loan; car loan; credit card; debt; home loan; ing; loan; payment; payments; paypal; vehicle loan
+0,"T0: app, apps, budgeting, budget, software",358,planning_budgeting_control,Planning / budgeting / control,1.0,ausgaben; budget; track
+2,"T2: bitcoin, gold, crypto, krypto, kaufen",265,investment_strategy,Investment strategy,1.0,invest

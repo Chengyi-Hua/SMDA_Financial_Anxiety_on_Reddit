@@ -2,45 +2,22 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-# =========================
-# Input / output files
-# =========================
-
 MANUAL_FILE = Path(
-    r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis\manual_inspection\manual_inspection_blinded_filled.csv"
+    r"SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis\manual_inspection\manual_inspection_blinded_filled.csv"
 )
 
 ANSWER_KEY_FILE = Path(
-    r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis\manual_inspection\manual_inspection_answer_key.csv"
+    r"SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis\manual_inspection\manual_inspection_answer_key.csv"
 )
 
-# IMPORTANT:
-# Do NOT overwrite validation_result.csv.
-# That file was used earlier as your source of filled manual labels.
 OUT_CSV = Path(
-    r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis\manual_inspection\validation_comparison_result.csv"
+    r"SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis\manual_inspection\validation_comparison_result.csv"
 )
 
 
-# =========================
-# Helper functions
-# =========================
 
 def read_manual_annotations_only(path: Path) -> pd.DataFrame:
-    """
-    Reads ONLY the first annotation columns from the manual file.
 
-    Expected first columns:
-    inspection_id,
-    manual_text_sentiment,
-    manual_text_sentiment_notes,
-    manual_emoji_function,
-    manual_emoji_notes,
-    ...
-
-    This avoids parsing the long Reddit text columns, which may contain commas,
-    quotes, emojis, or other messy CSV content.
-    """
     rows = []
 
     with open(path, "r", encoding="utf-8-sig", errors="replace") as f:
@@ -54,19 +31,9 @@ def read_manual_annotations_only(path: Path) -> pd.DataFrame:
 
             if not line.strip():
                 continue
-
-            # Ignore continuation lines from any accidental embedded line breaks
             if not line.startswith("MI_"):
                 continue
 
-            # Split only the first 5 commas.
-            # This gives:
-            # 0 inspection_id
-            # 1 manual_text_sentiment
-            # 2 manual_text_sentiment_notes
-            # 3 manual_emoji_function
-            # 4 manual_emoji_notes
-            # 5 rest of row, ignored
             parts = line.split(",", 5)
 
             if len(parts) < 4:
@@ -172,10 +139,6 @@ def add_row(
     })
 
 
-# =========================
-# Load data
-# =========================
-
 manual = read_manual_annotations_only(MANUAL_FILE)
 answer = read_answer_key(ANSWER_KEY_FILE)
 
@@ -233,14 +196,8 @@ if missing_from_manual:
     print(f"Total missing from manual file: {len(missing_from_manual)}")
 
 
-# =========================
-# Merge
-# =========================
 
-# This is the key fix:
-# manual contains ONLY annotation columns.
-# answer contains has_emoji, sample_type, community, model labels, etc.
-# Therefore pandas will NOT create has_emoji_x / has_emoji_y.
+# Merge
 df = manual.merge(
     answer,
     on="inspection_id",
@@ -260,16 +217,10 @@ for col in [
     df[col] = df[col].astype(str).str.strip().str.lower()
 
 df["has_emoji_bool"] = df["has_emoji"].apply(as_bool)
-
-# The answer key does not necessarily contain short_text.
-# Use title as a readable fallback in mismatch output.
 if "short_text" not in df.columns:
     df["short_text"] = df["title"].fillna("").astype(str)
 
 
-# =========================
-# Text sentiment comparison
-# =========================
 
 text_map = {
     "negative": "negative",
@@ -316,10 +267,6 @@ text_mismatches = df.loc[
     df["text_eligible"] & (df["xlm_match"] == False)
 ].copy()
 
-
-# =========================
-# Emoji comparison
-# =========================
 
 emoji_map = {
     "positive_or_softening": "positive",
@@ -373,9 +320,6 @@ emoji_mismatches = df.loc[
 ].copy()
 
 
-# =========================
-# Build output CSV
-# =========================
 
 rows = []
 
@@ -495,10 +439,6 @@ results = pd.DataFrame(rows)
 results.to_csv(OUT_CSV, index=False, encoding="utf-8-sig")
 
 
-# =========================
-# Print results
-# =========================
-
 print("\n=== Manual inspection validation summary ===")
 print(f"Rows in manual file: {len(manual)}")
 print(f"Rows in answer-key file: {len(answer)}")
@@ -511,13 +451,13 @@ print(
     f"{emoji_only_matches}/{emoji_only_n} = {fmt_pct(emoji_only_percent)}%"
 )
 
-print("\n=== Text confusion matrix ===")
+print("\nText confusion matrix:")
 print(text_confusion)
 
-print("\n=== Emoji confusion matrix ===")
+print("\nEmoji confusion matrix:")
 print(emoji_confusion)
 
-print("\n=== Suggested LaTeX sentence ===")
+print("\nSuggested LaTeX sentence:")
 print(paper_sentence)
 
 print(f"\nSaved output CSV to: {OUT_CSV}")

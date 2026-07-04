@@ -1,5 +1,3 @@
-# significance_and_distribution_tests.py
-
 from pathlib import Path
 import numpy as np
 import pandas as pd
@@ -17,11 +15,8 @@ from scipy.stats import (
     normaltest,
 )
 
-#
-# CONFIG
-#
 
-DATA_DIR = Path(r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis")
+DATA_DIR = Path(r"SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis")
 OUTPUT_DIR = DATA_DIR / "sentiment_outputs"
 TEST_DIR = OUTPUT_DIR / "significance_tests"
 FIG_DIR = TEST_DIR / "distribution_figures"
@@ -45,11 +40,6 @@ BOOTSTRAP_N = 1000
 BOOTSTRAP_MAX_N = 20000
 
 rng = np.random.default_rng(RANDOM_SEED)
-
-
-#
-# HELPERS
-#
 
 def pretty_community(x):
     if x == "finanzen":
@@ -102,10 +92,6 @@ def bootstrap_ci_diff(x, y, stat_func=np.mean, n_boot=BOOTSTRAP_N):
     return np.percentile(diffs, 2.5), np.percentile(diffs, 97.5)
 
 
-#
-# LOAD
-#
-
 data = pd.read_csv(POSTS_FILE, low_memory=False)
 
 data["community_pretty"] = data["community"].map(pretty_community)
@@ -115,10 +101,7 @@ if EMOJI_BINARY in data.columns:
     data[EMOJI_BINARY] = data[EMOJI_BINARY].astype(str).str.lower().isin(["true", "1", "yes"])
 
 
-#
-# 1. DISTRIBUTION DIAGNOSTICS
-#
-
+# DISTRIBUTION DIAGNOSTICS
 score_columns = [
     MAIN_SCORE,
     VADER_SCORE,
@@ -152,7 +135,6 @@ for score in score_columns:
             "kurtosis": kurtosis(values) if len(values) > 3 else np.nan,
         })
 
-        # Normality tests are over-sensitive for huge n, so test a random sample.
         sample_values = values
         if len(sample_values) > NORMALITY_SAMPLE_N:
             sample_values = rng.choice(sample_values, size=NORMALITY_SAMPLE_N, replace=False)
@@ -183,7 +165,6 @@ for score in score_columns:
             )
         })
 
-        # Histogram
         plt.figure(figsize=(7, 4))
         plt.hist(values, bins=50)
         plt.axvline(np.mean(values), linestyle="--", linewidth=1, label="Mean")
@@ -203,10 +184,7 @@ distribution_df.to_csv(TEST_DIR / "distribution_summary.csv", index=False, encod
 normality_df.to_csv(TEST_DIR / "normality_diagnostics.csv", index=False, encoding="utf-8-sig")
 
 
-#
-# 2. SCORE TESTS: 2025 VS 2020 WITHIN EACH COMMUNITY
-#
-
+#  SCORE TESTS: 2025 VS 2020 WITHIN EACH COMMUNITY
 test_rows = []
 
 for score in score_columns:
@@ -257,7 +235,6 @@ for score in score_columns:
             "welch_p": t_p,
         })
 
-    # Pooled comparison, composition-sensitive
     x = clean_numeric(data[data["year"] == 2025][score])
     y = clean_numeric(data[data["year"] == 2020][score])
 
@@ -304,9 +281,7 @@ score_tests_df = pd.DataFrame(test_rows)
 score_tests_df.to_csv(TEST_DIR / "year_score_tests_2025_vs_2020.csv", index=False, encoding="utf-8-sig")
 
 
-#
-# 3. KRUSKAL-WALLIS ACROSS ALL FOUR GROUPS
-#
+# KRUSKAL-WALLIS ACROSS ALL FOUR GROUPS
 
 kruskal_rows = []
 
@@ -334,9 +309,7 @@ kruskal_df = pd.DataFrame(kruskal_rows)
 kruskal_df.to_csv(TEST_DIR / "kruskal_all_groups.csv", index=False, encoding="utf-8-sig")
 
 
-#
-# 4. CATEGORICAL TESTS: XLM LABEL DISTRIBUTION BY YEAR
-#
+# CATEGORICAL TESTS: XLM LABEL DISTRIBUTION BY YEAR
 
 label_test_rows = []
 
@@ -375,9 +348,7 @@ label_tests_df = pd.DataFrame(label_test_rows)
 label_tests_df.to_csv(TEST_DIR / "sentiment_label_chi_square_tests.csv", index=False, encoding="utf-8-sig")
 
 
-#
-# 5. EMOJI USAGE TESTS: HAS_EMOJI BY YEAR
-#
+# EMOJI USAGE TESTS: HAS_EMOJI BY YEAR
 
 emoji_presence_rows = []
 
@@ -427,9 +398,7 @@ emoji_presence_df = pd.DataFrame(emoji_presence_rows)
 emoji_presence_df.to_csv(TEST_DIR / "emoji_presence_chi_square_tests.csv", index=False, encoding="utf-8-sig")
 
 
-#
-# 6. EMOJI AFFECT LABEL TESTS AMONG EMOJI POSTS ONLY
-#
+# EMOJI AFFECT LABEL TESTS AMONG EMOJI POSTS ONLY
 
 emoji_affect_rows = []
 
@@ -473,9 +442,7 @@ emoji_affect_df = pd.DataFrame(emoji_affect_rows)
 emoji_affect_df.to_csv(TEST_DIR / "emoji_affect_label_chi_square_tests.csv", index=False, encoding="utf-8-sig")
 
 
-#
-# 7. SHORT TEXT SUMMARY
-#
+# SHORT TEXT 
 
 summary_path = TEST_DIR / "significance_testing_readme.txt"
 

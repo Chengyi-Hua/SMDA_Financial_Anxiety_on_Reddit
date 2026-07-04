@@ -1,16 +1,9 @@
-# visualize_sentiment_outputs.py
-
 from pathlib import Path
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
-
-#
-# CONFIG
-#
-
-DATA_DIR = Path(r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis")
+DATA_DIR = Path(r"SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis")
 OUTPUT_DIR = DATA_DIR / "sentiment_outputs"
 FIG_DIR = OUTPUT_DIR / "figures"
 FIG_DIR.mkdir(parents=True, exist_ok=True)
@@ -25,11 +18,6 @@ MAIN_SCORE = "no_emoji_xlm_sentiment_score"
 MAIN_LABEL_PREFIX = "no_emoji_xlm_label"
 VADER_SCORE = "no_emoji_vader_compound"
 ESR_SCORE = "esr_emoji_score_mean"
-
-
-#
-# HELPERS
-#
 
 def pretty_community(x):
     if x == "finanzen":
@@ -68,11 +56,6 @@ def ci(series):
 def sorted_summary(df):
     return df.sort_values(["community", "year"]).reset_index(drop=True)
 
-
-#
-# LOAD DATA
-#
-
 group_summary = add_group_label(sorted_summary(pd.read_csv(GROUP_SUMMARY_FILE)))
 balanced_summary = add_group_label(sorted_summary(pd.read_csv(BALANCED_SUMMARY_FILE)))
 emoji_summary = add_group_label(sorted_summary(pd.read_csv(EMOJI_SUMMARY_FILE)))
@@ -83,10 +66,7 @@ posts["community_pretty"] = posts["community"].map(pretty_community)
 posts["group_label"] = posts["community_pretty"] + " " + posts["year"].astype(str)
 
 
-#
-# 1. MAIN TEXT SENTIMENT BY COMMUNITY AND YEAR
-#
-
+# MAIN TEXT SENTIMENT BY COMMUNITY AND YEAR
 def plot_main_sentiment(summary_df, suffix):
     mean_col = f"{MAIN_SCORE}_mean"
     low_col = f"{MAIN_SCORE}_ci_low"
@@ -118,9 +98,8 @@ plot_main_sentiment(group_summary, "full_sample")
 plot_main_sentiment(balanced_summary, "balanced_sample")
 
 
-#
-# 2. TEXT SENTIMENT LABEL SHARES
-#
+
+# TEXT SENTIMENT LABEL SHARES
 
 def plot_label_shares(summary_df, suffix):
     cols = [
@@ -152,10 +131,7 @@ plot_label_shares(group_summary, "full_sample")
 plot_label_shares(balanced_summary, "balanced_sample")
 
 
-#
-# 3. POOLED 2020 VS 2025 OVERVIEW
-#
-
+# POOLED 2020 VS 2025 OVERVIEW
 pooled_sentiment = (
     posts
     .groupby("year")[MAIN_SCORE]
@@ -212,9 +188,7 @@ plt.figtext(
 savefig("03_pooled_text_sentiment_by_year")
 
 
-#
-# 4. EMOJI USAGE BY COMMUNITY AND YEAR
-#
+# EMOJI USAGE BY COMMUNITY AND YEAR
 
 x = np.arange(len(emoji_summary))
 
@@ -225,10 +199,6 @@ plt.ylabel("Posts with emoji (%)")
 plt.title("Emoji usage by community and year")
 savefig("04_emoji_share_by_group")
 
-
-#
-# 5. EXPLICIT EMOJI AFFECT
-#
 
 emoji_affect = emoji_summary.copy()
 emoji_affect["mapped_total"] = (
@@ -280,9 +250,7 @@ plt.figtext(
 savefig("06_mean_emoji_sentiment_score")
 
 
-#
-# 6. VADER VS XLM-R METHOD COMPARISON
-#
+# VADER VS XLM-R METHOD COMPARISON
 
 method_df = group_summary.copy()
 
@@ -316,10 +284,7 @@ plt.figtext(
 savefig("07_vader_vs_xlm_method_comparison")
 
 
-#
-# 7. FULL SAMPLE VS BALANCED SAMPLE ROBUSTNESS
-#
-
+# FULL SAMPLE VS BALANCED SAMPLE ROBUSTNESS
 robust = group_summary[["group_label", f"{MAIN_SCORE}_mean"]].rename(
     columns={f"{MAIN_SCORE}_mean": "full_sample"}
 ).merge(
@@ -344,10 +309,8 @@ plt.legend()
 savefig("08_full_vs_balanced_sentiment")
 
 
-#
-# 8. TEXT SENTIMENT VS EMOJI AFFECT
-#
 
+# TEXT SENTIMENT VS EMOJI AFFECT
 text_emoji = group_summary[["community", "year", "group_label", f"{MAIN_SCORE}_mean"]].merge(
     emoji_summary[["community", "year", "mean_esr_emoji_score"]],
     on=["community", "year"],
@@ -384,10 +347,8 @@ plt.figtext(
 savefig("09_text_sentiment_vs_emoji_affect")
 
 
-#
-# 9. VALIDATION SAMPLES FOR MANUAL INSPECTION
-#
 
+# VALIDATION SAMPLES FOR MANUAL INSPECTION
 validation_cols = [
     "analysis_id",
     "community",
@@ -437,9 +398,6 @@ validation_sample.to_csv(validation_path, index=False, encoding="utf-8-sig")
 print(f"Saved validation samples: {validation_path}")
 
 
-#
-# 10. FIGURE MANIFEST
-#
 
 manifest = pd.DataFrame({
     "figure": [

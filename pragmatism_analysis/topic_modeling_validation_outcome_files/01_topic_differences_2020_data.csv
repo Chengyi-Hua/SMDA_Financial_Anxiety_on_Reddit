@@ -1,0 +1,16 @@
+﻿topic,topic_label,finanzen,personalfinance,difference_finanzen_minus_personalfinance,mapped_structural_category,mapped_structural_category_label
+13,"T13: ira, roth, roth ira, traditional, account",0.0,0.07520412548345509,-0.07520412548345509,financial_institutions_products,Financial institutions / products
+20,"T20: mortgage, loan, home, house, rate",0.007520412548345509,0.08186506231198969,-0.07434464976364417,financial_institutions_products,Financial institutions / products
+19,"T19: taxes, tax, file, return, income",0.008809626128061882,0.07112161581435325,-0.06231198968629137,policy_regulation,Policy / regulation
+25,"T25: credit, debt, loan, pay, card",0.0021486892995272885,0.0588740868070477,-0.05672539750752041,financial_institutions_products,Financial institutions / products
+9,"T9: account, bank, card, credit, check",0.013966480446927373,0.06574989256553503,-0.05178341211860765,financial_institutions_products,Financial institutions / products
+11,"T11: credit, card, credit card, cards, score",0.008165019338203695,0.05951869359690589,-0.051353674258702194,financial_institutions_products,Financial institutions / products
+5,"T5: car, loan, auto, vehicle, pay",0.014181349376880103,0.060163300386764075,-0.045981951009883976,practical_problem_solving,Practical problem-solving
+22,"T22: steuererklärung, steuern, steuer, tax, einkommen",0.0543618392780404,0.009883970777825527,0.04447786850021487,policy_regulation,Policy / regulation
+3,"T3: depot, republic, trade republic, trade, kaufen",0.05543618392780404,0.007950150408250967,0.04748603351955308,financial_institutions_products,Financial institutions / products
+21,"T21: job, studium, gehalt, ausbildung, master",0.0700472711645896,0.013751611516974646,0.05629565964761495,macro_economic_context,Macro-economic context
+14,"T14: deutschland, schweiz, deutschen, deutsche, steuern",0.05908895573700043,0.0017189514396218307,0.0573700042973786,policy_regulation,Policy / regulation
+7,"T7: aktien, aktie, stock, verkaufen, broker",0.07778255264288784,0.01633003867640739,0.06145251396648045,investment_strategy,Investment strategy
+28,"T28: sparplan, depot, zinsen, etf, a1jx52",0.06682423721529866,0.004297378599054577,0.06252685861624409,investment_strategy,Investment strategy
+12,"T12: etf, msci, world, etfs, broker",0.08680704770090245,0.006446067898581865,0.08036097980232058,investment_strategy,Investment strategy
+17,"T17: etf, etfs, investieren, sparplan, msci",0.11366566394499356,0.008379888268156424,0.10528577567683713,investment_strategy,Investment strategy

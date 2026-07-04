@@ -1,0 +1,50 @@
+﻿section,metric,row_label,column_label,value,numerator,denominator,percent,inspection_id,sample_type,community,year,title,manual_label,model_label,emojis_extracted,model_score,short_text
+summary,Rows in manual file,,,52,,,,,,,,,,,,,
+summary,Rows in answer-key file,,,52,,,,,,,,,,,,,
+summary,Rows after merge,,,52,,,,,,,,,,,,,
+summary,XLM-RoBERTa text agreement,,,42/52,42,52,80.77,,,,,,,,,,
+summary,Emoji agreement overall,,,50/52,50,52,96.15,,,,,,,,,,
+summary,Emoji agreement on emoji-containing posts only,,,15/17,15,17,88.24,,,,,,,,,,
+summary,Text mismatches,,,10,,,,,,,,,,,,,
+summary,Emoji mismatches,,,2,,,,,,,,,,,,,
+summary_by_year,XLM-RoBERTa text agreement,2020,,22/26,22,26,84.62,,,,,,,,,,
+summary_by_year,Emoji agreement on emoji-containing posts only,2020,,6/8,6,8,75.0,,,,,,,,,,
+summary_by_year,XLM-RoBERTa text agreement,2025,,20/26,20,26,76.92,,,,,,,,,,
+summary_by_year,Emoji agreement on emoji-containing posts only,2025,,9/9,9,9,100.0,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,negative,negative,21,,,,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,negative,neutral,2,,,,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,negative,positive,0,,,,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,neutral_or_mixed,negative,5,,,,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,neutral_or_mixed,neutral,20,,,,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,neutral_or_mixed,positive,0,,,,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,positive,negative,0,,,,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,positive,neutral,3,,,,,,,,,,,,,
+text_confusion,manual_text_sentiment vs no_emoji_xlm_label,positive,positive,1,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,no_emoji,no_emoji,35,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,no_emoji,positive,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,no_emoji,negative,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,no_emoji,neutral,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,positive_or_softening,no_emoji,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,positive_or_softening,positive,15,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,positive_or_softening,negative,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,positive_or_softening,neutral,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,negative,no_emoji,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,negative,positive,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,negative,negative,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,negative,neutral,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,neutral,no_emoji,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,neutral,positive,2,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,neutral,negative,0,,,,,,,,,,,,,
+emoji_confusion,manual_emoji_function vs esr_emoji_label,neutral,neutral,0,,,,,,,,,,,,,
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0004,negative_text_positive_emoji,finanzen,2020,Depotübertrag,neutral_or_mixed,negative,,-0.8396037,Depotübertrag
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0017,negative_text_positive_emoji,personalfinance,2020,Student Loans vs. Credit,neutral_or_mixed,negative,,-0.9207952,Student Loans vs. Credit
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0018,negative_text_positive_emoji,finanzen,2025,ETF888 Wieso -xx%,neutral_or_mixed,negative,,-0.9446708,ETF888 Wieso -xx%
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0020,most_neutral_xlm,personalfinance,2020,Are 2019 Roth contributions extended as well?,neutral_or_mixed,negative,,-1.3649464e-05,Are 2019 Roth contributions extended as well?
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0022,random_posts,finanzen,2025,PKV oder GKV? Gutverdiener (30) mit Familienplanung sucht Rat zum Wechsel,negative,neutral,,-0.1499921,PKV oder GKV? Gutverdiener (30) mit Familienplanung sucht Rat zum Wechsel
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0033,random_posts,personalfinance,2025,Looking for financial advice – Stable income but unsure what to do next,neutral_or_mixed,negative,,-0.27740407,Looking for financial advice – Stable income but unsure what to do next
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0036,random_posts,finanzen,2020,Teure Reparaturen am Auto vor Verkauf,negative,neutral,,-0.20114419,Teure Reparaturen am Auto vor Verkauf
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0041,strongest_emoji_affect,finanzen,2025,"130.000€ Aktien Kursgewinn❤️Empirische Wissenschaftliche Fakten Hayek: ""Niemand hat vom Kapitalismus mehr profitiert als die Arbeiterklasse!""",positive,neutral,,-0.056135915,"130.000€ Aktien Kursgewinn❤️Empirische Wissenschaftliche Fakten Hayek: ""Niemand hat vom Kapitalismus mehr profitiert als die Arbeiterklasse!"""
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0044,strongest_emoji_affect,finanzen,2025,PJM Investment Akademie - kostenloses Online Event Basis Finanzwissen,positive,neutral,,-0.09034988,PJM Investment Akademie - kostenloses Online Event Basis Finanzwissen
+text_mismatch,XLM-RoBERTa mismatch,,,,,,,MI_0047,most_neutral_xlm,finanzen,2025,Tech-Calls,positive,neutral,,0.00018377602,Tech-Calls
+emoji_mismatch,Emoji model mismatch,,,,,,,MI_0040,strongest_emoji_affect,personalfinance,2020,"An ATM denied my request, but my Venno balance was charged in full anyway.",neutral,positive,🏧,0.8,"An ATM denied my request, but my Venno balance was charged in full anyway."
+emoji_mismatch,Emoji model mismatch,,,,,,,MI_0052,negative_text_positive_emoji,personalfinance,2020,Moving out of my parents' basement,neutral,positive,📷 📷,0.43,Moving out of my parents' basement

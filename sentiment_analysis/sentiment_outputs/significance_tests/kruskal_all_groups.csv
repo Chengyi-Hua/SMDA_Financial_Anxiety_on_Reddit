@@ -1,4 +1,0 @@
-﻿score,groups,kruskal_statistic,kruskal_p,interpretation
-no_emoji_xlm_sentiment_score,finanzen_2020; finanzen_2025; personalfinance_2020; personalfinance_2025,149.99694327133912,2.6389175789174575e-32,At least one community-year group differs
-no_emoji_vader_compound,finanzen_2020; finanzen_2025; personalfinance_2020; personalfinance_2025,44937.83638867066,0.0,At least one community-year group differs
-esr_emoji_score_mean,finanzen_2020; finanzen_2025; personalfinance_2020; personalfinance_2025,131.35802054362438,2.7568038044243433e-28,At least one community-year group differs

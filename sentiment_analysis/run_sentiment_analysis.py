@@ -1,21 +1,12 @@
-# run_sentiment_analysis.py
-
 from pathlib import Path
 import re
 import itertools
 import warnings
-
 import numpy as np
 import pandas as pd
 from tqdm.auto import tqdm
 import emoji
-
 warnings.filterwarnings("ignore")
-
-
-#
-# 1. CONFIGURATION
-#
 
 DATA_DIR = Path(r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\data")
 
@@ -34,7 +25,6 @@ LANG_CONFIDENCE_MIN = 0.80
 
 RANDOM_SEED = 42
 
-# Main multilingual model for English + German
 RUN_XLM_TRANSFORMER = True
 XLM_MODEL_NAME = "cardiffnlp/twitter-xlm-roberta-base-sentiment"
 
@@ -55,9 +45,6 @@ ESR_URL = "https://kt.ijs.si/data/Emoji_sentiment_ranking/"
 ESR_POS_THRESHOLD = 0.05
 ESR_NEG_THRESHOLD = -0.05
 
-#
-# 2. EMOJI HANDLING
-#
 
 def count_emojis(text):
     if not isinstance(text, str):
@@ -82,10 +69,7 @@ SKIN_TONE_RE = re.compile("[\U0001F3FB-\U0001F3FF]")
 
 
 def normalize_emoji_for_lookup(e):
-    """
-    Normalizes emoji variants for lookup in the older Emoji Sentiment Ranking.
-    Removes variation selector and skin tone modifiers.
-    """
+
     if not isinstance(e, str):
         return ""
 
@@ -111,12 +95,6 @@ def classify_esr_score(score):
 
 
 def load_emoji_sentiment_ranking():
-    """
-    Loads Emoji Sentiment Ranking v1.0 from the official web table.
-    The web table includes:
-    emoji, occurrence count, negative/neutral/positive proportions,
-    sentiment score, Unicode name, and Unicode block.
-    """
     print("Loading Emoji Sentiment Ranking...")
 
     tables = pd.read_html(ESR_URL)
@@ -124,8 +102,6 @@ def load_emoji_sentiment_ranking():
         raise RuntimeError("Could not load Emoji Sentiment Ranking table.")
 
     esr = tables[0].copy()
-
-    # Flatten columns in case pandas creates a MultiIndex
     esr.columns = [
         "_".join([str(x) for x in col if str(x) != "nan"]).strip()
         if isinstance(col, tuple)
@@ -135,9 +111,6 @@ def load_emoji_sentiment_ranking():
 
     print("ESR columns detected:")
     print(esr.columns.tolist())
-
-    # The KT table currently has stable positional structure.
-    # We infer key columns by position to avoid fragile column-name parsing.
     rename_by_position = {
         esr.columns[0]: "emoji",
         esr.columns[2]: "unicode_codepoint",
@@ -150,8 +123,6 @@ def load_emoji_sentiment_ranking():
     }
 
     esr = esr.rename(columns=rename_by_position)
-
-    # Try to preserve Unicode name and block if available
     possible_name_cols = [c for c in esr.columns if "Unicode name" in c or "name" in c.lower()]
     possible_block_cols = [c for c in esr.columns if "Unicode block" in c or "block" in c.lower()]
 
@@ -313,10 +284,6 @@ def add_emoji_sentiment_ranking(data):
     return data
 
 
-#
-# 3. METADATA AND LOADING
-#
-
 def infer_metadata(filename):
     name = filename.lower()
 
@@ -398,9 +365,6 @@ def load_all_data():
     return data
 
 
-#
-# 4. BASIC TEXT FEATURES
-#
 
 def add_basic_text_features(data):
     print("Adding basic text features...")
@@ -420,9 +384,6 @@ def add_basic_text_features(data):
     return data
 
 
-#
-# 5. VADER BASELINE SENTIMENT
-#
 
 def add_vader_sentiment(data, text_col, prefix):
     print(f"Running VADER on: {text_col}")
@@ -460,9 +421,6 @@ def add_vader_sentiment(data, text_col, prefix):
     return data
 
 
-#
-# 6. MULTILINGUAL TRANSFORMER SENTIMENT
-#
 
 def get_label_indices(model):
     id2label = getattr(model.config, "id2label", {}) or {}
@@ -566,9 +524,6 @@ def add_xlm_sentiment(data, text_col, prefix):
     return data
 
 
-#
-# 7. SUMMARIES
-#
 
 def confidence_interval_95(series):
     series = series.dropna()
@@ -704,9 +659,7 @@ def make_balanced_sample(data):
     return balanced
 
 
-#
-# 8. STATISTICAL TESTS
-#
+# STATISTICAL TESTS
 
 def run_statistical_tests(data, score_columns, output_name):
     print(f"Running statistical tests: {output_name}")
@@ -790,9 +743,6 @@ def run_statistical_tests(data, score_columns, output_name):
     return results_df
 
 
-#
-# 9. MAIN PIPELINE
-#
 
 def main():
     print("=" * 70)
@@ -809,7 +759,6 @@ def main():
 
     data = add_basic_text_features(data)
 
-    # Filter language confidence
     before = len(data)
     data = data[data["language_confidence"] >= LANG_CONFIDENCE_MIN].copy()
     after = len(data)
@@ -885,9 +834,7 @@ def main():
             encoding="utf-8-sig"
         )
 
-    # ----------------------------
-    # VADER baseline
-    # ----------------------------
+
     data = add_vader_sentiment(
         data=data,
         text_col=TEXT_COL,
@@ -900,9 +847,7 @@ def main():
         prefix="no_emoji"
     )
 
-    # ----------------------------
     # Multilingual transformer
-    # ----------------------------
     if RUN_XLM_TRANSFORMER:
         # Main multilingual text sentiment: emojis removed
         data = add_xlm_sentiment(
@@ -910,7 +855,6 @@ def main():
             text_col="text_for_sentiment_no_emoji",
             prefix="no_emoji"
         )
-
         # Optional robustness: full post including emojis, but not needed
         if RUN_XLM_EMOJI_included:
             data = add_xlm_sentiment(
@@ -919,10 +863,7 @@ def main():
                 prefix="with_emoji"
             )
 
-    # ----------------------------
-    # Save scored data
-    # ----------------------------
-    print("\nSaving scored data...")
+    print("\nSaving scored data.")
 
     full_output_path = OUTPUT_DIR / "sentiment_scored_posts_full.csv"
     data.to_csv(full_output_path, index=False, encoding="utf-8-sig")
@@ -981,10 +922,6 @@ def main():
 
     slim_output_path = OUTPUT_DIR / "sentiment_scored_posts_slim.csv"
     data[slim_cols].to_csv(slim_output_path, index=False, encoding="utf-8-sig")
-
-    # ----------------------------
-    # Summaries
-    # ----------------------------
     score_columns = [
         "with_emoji_vader_compound",
         "no_emoji_vader_compound",
@@ -1021,9 +958,6 @@ def main():
         output_name="sentiment_group_summary_balanced.csv"
     )
 
-    # ----------------------------
-    # Statistical tests
-    # ----------------------------
     run_statistical_tests(
         data=data,
         score_columns=score_columns,
@@ -1036,9 +970,6 @@ def main():
         output_name="sentiment_statistical_tests_balanced_sample.csv"
     )
 
-    # ----------------------------
-    # Print final locations
-    # ----------------------------
     print("\nDone.")
     print("=" * 70)
     print("Main outputs:")

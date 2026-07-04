@@ -1,46 +1,36 @@
-# run_pragmatism_analysis.py
 from __future__ import annotations
-
 from dataclasses import dataclass
+from keywords.keywords import PRAGMATISM_LEXICON
+from keywords.keywords import EPU_TRIAD_LEXICON
 from pathlib import Path
 import json
 import re
 import warnings
-
 import numpy as np
 import pandas as pd
-
 try:
     from tqdm.auto import tqdm
-except ImportError:  # keeps the script runnable without tqdm
+except ImportError: 
     def tqdm(iterable, **kwargs):
         return iterable
-
 warnings.filterwarnings("ignore")
 
-# ============================================================
-# 1. CONFIGURATION
-# ============================================================
 
 @dataclass(frozen=True)
 class Config:
-    project_dir: Path = Path(r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit")
+    project_dir: Path = Path(r"SMDA_Financial_Anxiety_on_Reddit")
     lang_confidence_min: float = 0.80
     random_seed: int = 42
     bootstrap_iterations: int = 1000
     rate_multiplier: int = 100
-
     # "fast" uses one compiled regex per category and is much faster.
     # "exact" preserves the old script's term-by-term counting more closely, but is slower.
     matching_mode: str = "exact"  # options: "fast", "exact"
-
     create_manual_sample: bool = True
     n_manual_per_type: int = 5
-
     text_col: str = "text_for_sentiment"
     xlm_score_col: str = "no_emoji_xlm_sentiment_score"
     xlm_label_col: str = "no_emoji_xlm_label"
-
     fallback_files: tuple[str, ...] = (
         "finanzen_2020_final.csv",
         "finanzen_2025_final.csv",
@@ -50,7 +40,6 @@ class Config:
     @property
     def data_dir(self) -> Path:
         return self.project_dir / "data"
-
     @property
     def output_dir(self) -> Path:
         return self.project_dir / "pragmatism_analysis" / "outputs"
@@ -59,254 +48,21 @@ class Config:
 CFG = Config()
 CFG.output_dir.mkdir(parents=True, exist_ok=True)
 
-# ============================================================
-# 2. STRUCTURAL PRAGMATISM LEXICON
-# ============================================================
-
-PRAGMATISM_LEXICON = {
-    "policy_regulation": {
-        "description": "Tax, law, regulation, government, policy, institutional rules",
-        "terms": [
-            "tax*", "income tax", "capital gains tax", "tax return*", "taxable",
-            "deductible*", "deduction*", "allowance*", "exemption*", "withholding",
-            "irs", "hmrc", "tax code*", "tax bracket*", "tax liability", "law*",
-            "legal*", "legislation", "regulat*", "regulation*", "policy", "government",
-            "congress", "white house", "federal reserve", "central bank", "tariff*",
-            "deficit*", "subsid*", "benefit*", "compliance", "filing", "audit*",
-            "rule*", "limit*", "cap*",
-            "steuer*", "steuererklärung*", "einkommensteuer*", "lohnsteuer*",
-            "abgeltungssteuer*", "kapitalertragsteuer*", "sparerpauschbetrag*",
-            "freibetrag*", "grundfreibetrag*", "finanzamt*", "elster", "gesetz*",
-            "rechtlich*", "regulier*", "regulierung*", "verordnung*", "politik*",
-            "regierung*", "bundesregierung*", "bundestag", "bafin", "bundesbank",
-            "ezb", "zentralbank*", "zoll*", "subvention*", "förderung*",
-            "beitragssatz*", "bemessungsgrenze*", "pflicht*",
-        ],
-    },
-    "macro_economic_context": {
-        "description": "Macroeconomic environment, crisis, inflation, rates, labor market",
-        "terms": [
-            "inflation*", "deflation*", "recession*", "depression*", "stagflation*",
-            "economy", "economic*", "macroeconomic*", "cost of living", "energy price*",
-            "gas price*", "oil price*", "food price*", "interest rate*", "rate hike*",
-            "rate cut*", "mortgage rate*", "yield curve", "central bank*",
-            "federal reserve", "fed rate*", "market crash*", "crash*", "crisis",
-            "financial crisis", "unemployment", "job market", "labor market", "wage*",
-            "salary*", "gdp", "growth", "supply chain*", "war", "geopolitical*",
-            "inflation*", "deflation*", "rezession*", "wirtschaft*", "konjunktur*",
-            "makroökonom*", "lebenshaltungskosten*", "energiepreis*", "gaspreis*",
-            "ölpreis*", "lebensmittelpreis*", "zins*", "zinssatz*", "leitzins*",
-            "bauzins*", "hypothekenzins*", "renditekurve*", "markteinbruch*",
-            "börsencrash*", "crash*", "krise*", "finanzkrise*", "arbeitslos*",
-            "arbeitsmarkt*", "lohn*", "gehalt*", "bip", "wachstum", "lieferkette*",
-            "krieg*", "geopolit*",
-        ],
-    },
-    "financial_institutions_products": {
-        "description": "Banks, brokers, insurance, credit, loans, pensions, accounts",
-        "terms": [
-            "bank*", "broker*", "brokerage*", "exchange*", "lender*", "credit union",
-            "insurance*", "insurer*", "pension*", "retirement account*", "401k",
-            "ira", "roth ira", "hsa", "fsa", "social security", "account*",
-            "checking account*", "savings account*", "high yield savings", "hysa",
-            "loan*", "student loan*", "mortgage*", "debt*", "credit*", "credit card*",
-            "credit score*", "fico", "apr", "interest", "installment*", "payment plan*",
-            "default*", "delinquen*", "collection*", "foreclosure*", "bankruptcy",
-            "refinance*",
-            "bank*", "sparkasse*", "volksbank*", "broker*", "depot*", "börse*",
-            "handelsplatz*", "konto*", "girokonto*", "tagesgeld*", "festgeld*",
-            "versicherung*", "versicherer*", "krankenkasse*", "gkv", "pkv", "rente*",
-            "rentenversicherung*", "pension*", "altersvorsorge*", "kredit*", "darlehen*",
-            "hypothek*", "baufinanzierung*", "schufa", "bonität*", "schuld*", "schulden*",
-            "zinsbindung*", "rate*", "tilgung*", "umschuldung*", "insolvenz*", "pfändung*",
-        ],
-    },
-    "investment_strategy": {
-        "description": "Investment products, portfolio construction, allocation, strategy",
-        "terms": [
-            "invest*", "investment*", "portfolio*", "asset allocation", "allocation*",
-            "diversif*", "rebalance*", "risk tolerance", "stock*", "share*", "equity",
-            "bond*", "fund*", "index fund*", "mutual fund*", "etf*", "s&p",
-            "s&p 500", "msci", "world index", "vanguard", "fidelity", "schwab",
-            "dividend*", "yield*", "capital gain*", "compound*", "compounding",
-            "dca", "dollar cost averaging", "buy and hold", "long term", "short term",
-            "retirement portfolio", "target date fund*", "boglehead*", "tax advantaged",
-            "tax efficient",
-            "investier*", "anlage*", "geldanlage*", "portfolio*", "asset allocation",
-            "allokation*", "diversifiz*", "rebalancing", "aktie*", "anleihe*",
-            "fonds*", "indexfonds*", "etf*", "sparplan*", "msci", "ftse",
-            "all world", "a1jx52", "dividende*", "ausschütt*", "thesaurier*",
-            "rendite*", "kursgewinn*", "zinsatz*", "zinsen", "zinseszins*",
-            "buy and hold", "langfristig*", "kurzfristig*", "altersvorsorge*",
-            "steueroptim*", "sparerfreibetrag*",
-        ],
-    },
-    "planning_budgeting_control": {
-        "description": "Planning, budgeting, calculation, comparison, optimization, control",
-        "terms": [
-            "budget*", "budgeting", "plan*", "planning", "strategy", "strategic",
-            "calculate*", "calculation*", "spreadsheet*", "excel", "compare*",
-            "comparison*", "optimize*", "optimise*", "estimate*", "forecast*",
-            "projection*", "track*", "tracking", "expense*", "cash flow",
-            "emergency fund*", "rainy day fund*", "sinking fund*", "savings goal*",
-            "monthly payment*", "monthly income", "net income", "gross income", "afford*",
-            "affordability", "cost breakdown", "scenario*", "option*", "tradeoff*",
-            "pros and cons", "decision", "next step*",
-            "budget*", "haushaltsbuch*", "plan*", "planung*", "strategie*",
-            "berechn*", "kalkulier*", "rechner*", "excel", "vergleich*", "vergleichen",
-            "optimier*", "schätz*", "prognose*", "track*", "ausgabe*", "einnahme*",
-            "cashflow", "notgroschen*", "rücklage*", "sparziel*", "monatsrate*",
-            "netto*", "brutto*", "leisten", "leistbar*", "kostenaufstellung*",
-            "szenario*", "option*", "abwäg*", "vor und nachteil*", "entscheidung*",
-            "nächste schritt*",
-        ],
-    },
-    "risk_uncertainty_management": {
-        "description": "Risk, uncertainty, volatility, liquidity, hedging, safety buffers",
-        "terms": [
-            "risk*", "uncertain*", "uncertainty", "volatile", "volatility", "liquidity",
-            "liquid*", "buffer*", "reserve*", "safety net", "hedge*", "hedging",
-            "protect*", "protection", "secure*", "security", "downside", "upside",
-            "exposure", "leverage*", "margin", "default risk", "counterparty risk",
-            "interest rate risk", "sequence risk", "market risk", "inflation risk",
-            "emergency", "contingency", "worst case", "stress test*", "safe withdrawal",
-            "risiko*", "unsicher*", "unsicherheit*", "volatil*", "liquidität*",
-            "liquide*", "puffer*", "reserve*", "sicherheit*", "absicher*", "schutz*",
-            "downside", "upside", "exposure", "hebel*", "margin", "ausfallrisiko*",
-            "kontrahentenrisiko*", "zinsrisiko*", "marktrisiko*", "inflationsrisiko*",
-            "notfall*", "worst case", "stresstest*", "entnahmerate*",
-        ],
-    },
-
-    "practical_problem_solving": {
-        "description": "Concrete advice, practical steps, optimization, and financial problem-solving",
-        "terms": [
-            # English
-            "set up", "open an account", "open a brokerage", "switch account*",
-            "switch bank*", "switch provider*", "automate*", "automatic transfer*",
-            "cancel*", "reduce expense*", "cut expense*", "lower cost*",
-            "increase saving*", "savings rate*", "monthly savings", "pay down",
-            "pay off", "repay*", "build emergency fund*", "track spending",
-            "review budget*", "compare provider*", "shop around", "negotiate*",
-            "recalculate*", "prioritize*", "consolidate debt*", "refinance*",
-            "avoid fee*", "fee-free", "low cost", "expense ratio", "total cost",
-            "net worth", "fixed cost*", "variable cost*", "monthly budget*",
-            "financial plan*", "surplus*", "standing order", "direct debit",
-
-            # German
-            "einrichten", "konto eröffnen", "depot eröffnen", "bank wechseln",
-            "anbieter wechseln", "automatisier*", "kündigen", "kosten senken",
-            "ausgaben senken", "ausgaben reduzieren", "sparen erhöhen",
-            "sparrate erhöhen", "sparrate*", "sparquote*", "tilgen",
-            "schuld* tilgen", "schulden abbezahlen", "notgroschen aufbauen",
-            "haushaltsbuch führen", "budget prüfen", "kosten vergleichen",
-            "anbieter vergleichen", "gebühren vermeiden", "gebührenfrei",
-            "kostenlos", "günstiger", "kostenquote*", "effektivkosten*",
-            "nettovermögen", "monatlich sparen", "dauerauftrag", "lastschrift",
-            "depotübertrag", "freistellungsauftrag", "fixkosten*",
-            "variable kosten*", "haushaltsplan*", "finanzplan*", "überschuss*",
-        ],
-    },
 
 
-    "opportunity_action_orientation": {
-        "description": "Opportunity-seeking, action orientation, financial agency",
-        "terms": [
-            "opportunit*", "chance*", "take advantage", "benefit from", "profit from",
-            "capitalize", "undervalued", "overvalued", "buy the dip", "entry point",
-            "upside potential", "return potential", "growth potential", "financial freedom",
-            "fire", "passive income", "increase income", "side income", "negotiate*",
-            "switch provider*", "move broker*", "refinance", "consolidate", "improve credit",
-            "pay off", "build wealth", "wealth building",
-            "chance*", "gelegenheit*", "profitier*", "nutzen", "ausnutzen",
-            "unterbewertet*", "überbewertet*", "dip kaufen", "einstiegspunkt*",
-            "kurspotenzial*", "renditepotenzial*", "wachstumspotenzial*",
-            "finanzielle freiheit", "fire", "passives einkommen", "nebeneinkommen*",
-            "gehalt verhandel*", "wechseln", "anbieterwechsel*", "brokerwechsel*",
-            "umschulden*", "konsolidier*", "bonität verbessern", "abbezahlen",
-            "vermögen aufbauen", "vermögensaufbau*",
-        ],
-    },
-}
-
-
-
-# ============================================================
-# 2B. BAKER-BLOOM-DAVIS-INSPIRED EPU TRIAD
-# ============================================================
-
-"""
-This is a stricter EPU-inspired submeasure.
-
-Baker, Bloom, and Davis identify EPU texts through a triad:
-1. economy/economic terms
-2. uncertainty terms
-3. policy terms
-
-Here we adapt that logic to English and German Reddit finance discourse.
-This is not the original newspaper EPU index; it is an adapted post-level flag.
-"""
-
-EPU_TRIAD_LEXICON = {
-    "epu_economy": {
-        "description": "Economy, business, commerce, and macroeconomic activity",
-        "terms": [
-            # English
-            "economic*", "economy", "business", "industry", "commerce",
-            "commercial", "market*", "growth", "gdp", "inflation*",
-            "recession*", "labor market", "job market", "unemployment",
-
-            # German
-            "wirtschaft*", "ökonom*", "oekonom*", "konjunktur*",
-            "unternehmen*", "markt*", "wachstum", "bip", "inflation*",
-            "rezession*", "arbeitsmarkt*", "arbeitslos*",
-        ],
-    },
-    "epu_uncertainty": {
-        "description": "Uncertainty, ambiguity, unclear outcomes",
-        "terms": [
-            # English
-            "uncertain*", "uncertainty", "unclear", "unknown", "unpredict*",
-            "ambiguous", "doubt*", "volatile", "volatility",
-
-            # German
-            "unsicher*", "unsicherheit*", "unklar*", "ungewiss*",
-            "unvorhersehbar*", "zweifel*", "volatil*", "schwankung*",
-        ],
-    },
-    "epu_policy": {
-        "description": "Policy, government, regulation, fiscal and monetary institutions",
-        "terms": [
-            # English: Baker/Bloom/Davis baseline and audit-related policy terms
-            "congress", "deficit*", "federal reserve", "fed", "legislation",
-            "regulation*", "regulatory", "white house", "government",
-            "policy", "tax*", "budget*", "spending", "senate", "president",
-            "tariff*", "war",
-
-            # German / German-context equivalents
-            "bundestag", "bundesregierung*", "regierung*", "politik*",
-            "gesetz*", "gesetzgebung*", "regulierung*", "regulier*",
-            "verordnung*", "steuer*", "haushalt*", "staatsausgaben*",
-            "defizit*", "schuldenbremse*", "ezb", "bundesbank",
-            "bafin", "zentralbank*", "zoll*", "krieg*",
-        ],
-    },
-}
-
+# BAKER-BLOOM-DAVIS-INSPIRED EPU TRIAD
+ 
 EPU_ORDER = list(EPU_TRIAD_LEXICON.keys())
 
 CATEGORY_ORDER = list(PRAGMATISM_LEXICON.keys())
 WORD_CHARS = r"\wäöüÄÖÜß"
 
-# ============================================================
-# 3. TEXT AND REGEX HELPERS
-# ============================================================
-
+ 
+# TEXT AND REGEX HELPERS
 def normalize_whitespace(text: object) -> str:
     if not isinstance(text, str):
         return ""
     return re.sub(r"\s+", " ", text).strip()
-
 
 def make_short_text(text: object, max_chars: int = 700) -> str:
     text = normalize_whitespace(text)
@@ -314,10 +70,6 @@ def make_short_text(text: object, max_chars: int = 700) -> str:
 
 
 def term_to_regex(term: str) -> str:
-    """
-    Converts a lexicon term into a regex pattern.
-    Supports trailing wildcard * and multi-word phrases.
-    """
     term = term.strip()
     if term.startswith("REGEX:"):
         return term.replace("REGEX:", "", 1)
@@ -335,10 +87,6 @@ def term_to_regex(term: str) -> str:
 
 
 def term_specificity(term: str) -> tuple[int, int, int]:
-    """
-    Longer phrase terms should be tried before short generic terms in fast mode.
-    This reduces cases where 'tax*' captures before 'tax return*'.
-    """
     clean = term.replace("*", "")
     return (len(term.split()), len(clean), int(not term.endswith("*")))
 
@@ -459,10 +207,9 @@ def add_epu_triad_features_to_record(result: dict, text: object) -> dict:
     result.update(score_epu_triad_terms(text))
     return result
 
-# ============================================================
-# 4. DATA LOADING
-# ============================================================
-
+ 
+# DATA LOADING
+ 
 def infer_metadata(filename: str) -> tuple[str, str, int | float]:
     name = filename.lower()
     if "finanzen" in name:
@@ -548,8 +295,6 @@ def load_from_original_files() -> pd.DataFrame:
 
 
 def load_data() -> pd.DataFrame:
-    # Pragmatism analysis reads directly from the cleaned CSVs in data/.
-    # It does not use sentiment_outputs as the main input.
     data = load_from_original_files()
 
     data["community"] = data["community"].astype(str)
@@ -559,10 +304,8 @@ def load_data() -> pd.DataFrame:
     data["word_count_for_rate"] = data["word_count"].replace(0, np.nan)
     return data
 
-# ============================================================
-# 5. PRAGMATISM SCORING
-# ============================================================
-
+ 
+# PRAGMATISM SCORING
 def empty_score_record() -> dict:
     result = {}
     for category in CATEGORY_ORDER:
@@ -704,9 +447,8 @@ def safe_rate(numerator: pd.Series, denominator: pd.Series) -> pd.Series:
         .fillna(0)
     )
 
-# ============================================================
-# 6. SUMMARIES
-# ============================================================
+ 
+# SUMMARIES
 
 def confidence_interval_95(series: pd.Series) -> tuple[float, float]:
     series = pd.to_numeric(series, errors="coerce").dropna()
@@ -849,10 +591,9 @@ def make_dominant_category_shares(data: pd.DataFrame) -> pd.DataFrame:
     dominant_pivot.to_csv(output_path, index=False, encoding="utf-8-sig")
     return dominant_pivot
 
-# ============================================================
-# 7. STATISTICAL TESTS
-# ============================================================
-
+ 
+# STATISTICAL TESTS
+ 
 def bootstrap_difference_ci(
     x: pd.Series,
     y: pd.Series,
@@ -993,7 +734,7 @@ def build_comparison_specs(data: pd.DataFrame) -> list[dict]:
     """
     comparison_specs = []
 
-    # 1. Within-community time comparison: 2025 minus 2020
+    # Within-community time comparison: 2025 minus 2020
     for community in sorted(data["community"].dropna().unique()):
         subset = data[data["community"] == community]
 
@@ -1006,7 +747,7 @@ def build_comparison_specs(data: pd.DataFrame) -> list[dict]:
                 "group_2": subset[subset["year"].eq(2020)],
             })
 
-    # 2. Between-community comparison within each year:
+    # Between-community comparison within each year:
     #    finanzen minus personalfinance
     communities_available = set(data["community"].dropna().astype(str).unique())
     if {"finanzen", "personalfinance"}.issubset(communities_available):
@@ -1025,7 +766,7 @@ def build_comparison_specs(data: pd.DataFrame) -> list[dict]:
                     "group_2": g_personalfinance,
                 })
 
-        # 3. Pooled between-community comparison.
+        # Pooled between-community comparison.
         #    This is composition-sensitive in the full sample, but useful alongside balanced results.
         g_finanzen_all = data[data["community"].eq("finanzen")]
         g_personalfinance_all = data[data["community"].eq("personalfinance")]
@@ -1039,7 +780,7 @@ def build_comparison_specs(data: pd.DataFrame) -> list[dict]:
                 "group_2": g_personalfinance_all,
             })
 
-    # 4. Pooled year comparison, kept as secondary/descriptive.
+    # Pooled year comparison, kept as secondary/descriptive.
     if year_values_available(data, {2020, 2025}):
         comparison_specs.append({
             "comparison_type": "pooled_2025_minus_2020_composition_sensitive",
@@ -1255,9 +996,9 @@ def run_categorical_tests(
     tests.to_csv(output_path, index=False, encoding="utf-8-sig")
 
     return tests
-# ============================================================
-# 8. RELATIONSHIP WITH SENTIMENT
-# ============================================================
+ 
+# RELATIONSHIP WITH SENTIMENT
+ 
 
 def analyze_sentiment_pragmatism_relationship(data: pd.DataFrame) -> tuple[pd.DataFrame, pd.DataFrame]:
     if CFG.xlm_score_col not in data.columns:
@@ -1346,9 +1087,9 @@ def analyze_sentiment_pragmatism_relationship(data: pd.DataFrame) -> tuple[pd.Da
     label_summary.to_csv(label_output_path, index=False, encoding="utf-8-sig")
     return correlations, label_summary
 
-# ============================================================
-# 9. MANUAL INSPECTION SAMPLE
-# ============================================================
+ 
+# MANUAL INSPECTION SAMPLE
+ 
 
 def add_manual_sample(samples: list[pd.DataFrame], df: pd.DataFrame, sample_type: str, n: int | None = None) -> None:
     if df.empty:
@@ -1481,9 +1222,9 @@ def create_manual_inspection_sample(data: pd.DataFrame) -> pd.DataFrame:
     print(f"Saved manual inspection CSV file: {output_csv}")
     return manual
 
-# ============================================================
-# 10. SAVE SCORED DATA
-# ============================================================
+ 
+# SAVE SCORED DATA
+ 
 
 def save_scored_data(data: pd.DataFrame) -> tuple[Path, Path]:
     print("Saving scored pragmatism data...")
@@ -1541,9 +1282,7 @@ def save_scored_data(data: pd.DataFrame) -> tuple[Path, Path]:
 
     return full_output, slim_output
 
-# ============================================================
-# 11. MAIN PIPELINE
-# ============================================================
+ 
 
 def print_group_sizes(data: pd.DataFrame) -> None:
     print("\nLoaded data shape:")
@@ -1610,9 +1349,9 @@ def main() -> None:
         data,
         output_name="pragmatism_distribution_diagnostics_full_sample.csv"
     )
-    # ----------------------------
+    
     # Full-sample summaries/tests
-    # ----------------------------
+      
     make_group_summary(
         data,
         output_name="pragmatism_group_summary_full_sample.csv"
@@ -1631,9 +1370,9 @@ def main() -> None:
         output_name="pragmatism_categorical_statistical_tests_full_sample.csv"
     )
 
-    # ----------------------------
+      
     # Balanced-sample summaries/tests
-    # ----------------------------
+      
     balanced = make_balanced_sample(data)
     make_distribution_diagnostics(
         balanced,

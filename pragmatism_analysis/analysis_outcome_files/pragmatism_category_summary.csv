@@ -1,0 +1,33 @@
+﻿community,year,category,description,n_posts,posts_with_category,category_share,total_category_count,mean_category_count,median_category_count,mean_category_rate_per_100_words,median_category_rate_per_100_words
+finanzen,2020,policy_regulation,"Tax, law, regulation, government, policy, institutional rules",4654,1333,0.2864202836269875,3724,0.8001718951439621,0.0,0.6362095959798854,0.0
+finanzen,2020,macro_economic_context,"Macroeconomic environment, crisis, inflation, rates, labor market",4654,1636,0.3515255694026644,3743,0.804254404813064,0.0,0.5159166109039693,0.0
+finanzen,2020,financial_institutions_products,"Banks, brokers, insurance, credit, loans, pensions, accounts",4654,2434,0.522990975504942,10123,2.175118177911474,1.0,1.7500813122916097,0.43859649122807015
+finanzen,2020,investment_strategy,"Investment products, portfolio construction, allocation, strategy",4654,2702,0.5805758487322733,21810,4.686291362269016,2.0,3.716336019684091,1.2096823364428997
+finanzen,2020,planning_budgeting_control,"Planning, budgeting, calculation, comparison, optimization, control",4654,1725,0.37064890416845725,5474,1.1761925225612377,0.0,0.7681894871248128,0.0
+finanzen,2020,risk_uncertainty_management,"Risk, uncertainty, volatility, liquidity, hedging, safety buffers",4654,683,0.14675547915771378,1267,0.2722389342501074,0.0,0.17466236437212967,0.0
+finanzen,2020,practical_problem_solving,"Concrete advice, practical steps, optimization, and financial problem-solving",4654,689,0.14804469273743018,1061,0.22797593467984528,0.0,0.1588351009839252,0.0
+finanzen,2020,opportunity_action_orientation,"Opportunity-seeking, action orientation, financial agency",4654,628,0.13493768801031372,1013,0.2176622260421143,0.0,0.1383718570877589,0.0
+finanzen,2025,policy_regulation,"Tax, law, regulation, government, policy, institutional rules",22669,5871,0.25898804534827297,14622,0.6450218359874719,0.0,0.5456094999852548,0.0
+finanzen,2025,macro_economic_context,"Macroeconomic environment, crisis, inflation, rates, labor market",22669,8334,0.36763862543561693,17331,0.7645242401517491,0.0,0.5906658323134484,0.0
+finanzen,2025,financial_institutions_products,"Banks, brokers, insurance, credit, loans, pensions, accounts",22669,11688,0.515593982972341,47205,2.082359168909083,1.0,1.7415148665158968,0.42194092827004215
+finanzen,2025,investment_strategy,"Investment products, portfolio construction, allocation, strategy",22669,11308,0.49883100269089947,70985,3.131368829679298,0.0,2.855987584441448,0.0
+finanzen,2025,planning_budgeting_control,"Planning, budgeting, calculation, comparison, optimization, control",22669,7628,0.33649477259693855,20611,0.9092152278441925,0.0,0.6374744772075711,0.0
+finanzen,2025,risk_uncertainty_management,"Risk, uncertainty, volatility, liquidity, hedging, safety buffers",22669,3320,0.14645551193259518,6005,0.26489920155278135,0.0,0.1922956604811146,0.0
+finanzen,2025,practical_problem_solving,"Concrete advice, practical steps, optimization, and financial problem-solving",22669,3336,0.14716132162865586,5007,0.2208743217609952,0.0,0.17867582603861054,0.0
+finanzen,2025,opportunity_action_orientation,"Opportunity-seeking, action orientation, financial agency",22669,2941,0.12973664475715735,4483,0.19775905421500728,0.0,0.15539188010477217,0.0
+personalfinance,2020,policy_regulation,"Tax, law, regulation, government, policy, institutional rules",103192,42822,0.4149740289944957,134092,1.2994418171951314,0.0,0.8944043368706115,0.0
+personalfinance,2020,macro_economic_context,"Macroeconomic environment, crisis, inflation, rates, labor market",103192,21034,0.20383363051399334,38583,0.3738952631986976,0.0,0.24017044844353516,0.0
+personalfinance,2020,financial_institutions_products,"Banks, brokers, insurance, credit, loans, pensions, accounts",103192,82489,0.799373982479262,633692,6.140902395534537,4.0,4.082942349975236,3.125
+personalfinance,2020,investment_strategy,"Investment products, portfolio construction, allocation, strategy",103192,37807,0.36637530041088456,171514,1.6620862082331964,0.0,1.187768641018037,0.0
+personalfinance,2020,planning_budgeting_control,"Planning, budgeting, calculation, comparison, optimization, control",103192,49905,0.48361307078068067,194652,1.8863090162028064,0.0,1.0977099309681062,0.0
+personalfinance,2020,risk_uncertainty_management,"Risk, uncertainty, volatility, liquidity, hedging, safety buffers",103192,18368,0.17799829444142956,33516,0.3247926195829134,0.0,0.1911064970772472,0.0
+personalfinance,2020,practical_problem_solving,"Concrete advice, practical steps, optimization, and financial problem-solving",103192,23132,0.22416466392743623,39346,0.3812892472284673,0.0,0.24389316808530728,0.0
+personalfinance,2020,opportunity_action_orientation,"Opportunity-seeking, action orientation, financial agency",103192,18885,0.18300837274207302,32637,0.31627451740444995,0.0,0.19954211466073354,0.0
+personalfinance,2025,policy_regulation,"Tax, law, regulation, government, policy, institutional rules",72726,28243,0.3883480460908066,78471,1.0789951324148173,0.0,0.6968389399933935,0.0
+personalfinance,2025,macro_economic_context,"Macroeconomic environment, crisis, inflation, rates, labor market",72726,14137,0.19438715177515606,23471,0.32273189780821165,0.0,0.19480729411135145,0.0
+personalfinance,2025,financial_institutions_products,"Banks, brokers, insurance, credit, loans, pensions, accounts",72726,59273,0.8150180128152242,440864,6.061986084756483,4.0,3.8922866988224967,3.0303030303030303
+personalfinance,2025,investment_strategy,"Investment products, portfolio construction, allocation, strategy",72726,33706,0.46346561064818637,138432,1.9034733107829387,0.0,1.313677585891448,0.0
+personalfinance,2025,planning_budgeting_control,"Planning, budgeting, calculation, comparison, optimization, control",72726,39833,0.5477133349833622,163607,2.249635618623326,1.0,1.343437318390928,0.5617977528089888
+personalfinance,2025,risk_uncertainty_management,"Risk, uncertainty, volatility, liquidity, hedging, safety buffers",72726,14946,0.20551109644418777,27608,0.3796166432912576,0.0,0.2206604380707509,0.0
+personalfinance,2025,practical_problem_solving,"Concrete advice, practical steps, optimization, and financial problem-solving",72726,16688,0.22946401562027335,26418,0.3632538569424965,0.0,0.22844279582877514,0.0
+personalfinance,2025,opportunity_action_orientation,"Opportunity-seeking, action orientation, financial agency",72726,13460,0.1850782388691802,21698,0.2983527211726205,0.0,0.1868490367563578,0.0

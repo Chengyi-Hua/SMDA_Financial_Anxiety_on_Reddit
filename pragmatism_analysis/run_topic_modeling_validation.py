@@ -1,31 +1,22 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 from pathlib import Path
 import re
 import warnings
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib.ticker import PercentFormatter
-
 from sklearn.cluster import KMeans
 from sklearn.feature_extraction.text import TfidfVectorizer, ENGLISH_STOP_WORDS
 from sklearn.metrics import silhouette_score
 from scipy.stats import chi2_contingency
-
 warnings.filterwarnings("ignore")
-
-
-# ============================================================
-# 1. CONFIGURATION
-# ============================================================
 
 @dataclass(frozen=True)
 class Config:
     project_dir: Path = Path(
-        r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit"
+        r"SMDA_Financial_Anxiety_on_Reddit"
     )
 
     input_filename: str = "pragmatism_balanced_sample.csv"
@@ -75,9 +66,6 @@ CFG.table_dir.mkdir(parents=True, exist_ok=True)
 CFG.figure_dir.mkdir(parents=True, exist_ok=True)
 
 
-# ============================================================
-# 2. STRUCTURAL PRAGMATISM CATEGORIES
-# ============================================================
 
 CATEGORY_ORDER = [
     "policy_regulation",
@@ -106,9 +94,8 @@ COMMUNITY_ORDER = ["finanzen", "personalfinance"]
 YEAR_ORDER = [2020, 2025]
 
 
-# ============================================================
-# 3. LIGHTWEIGHT MAPPING SEED TERMS
-# ============================================================
+  
+# MAPPING SEED TERMS
 
 SEED_LEXICON = {
     "policy_regulation": [
@@ -164,10 +151,8 @@ SEED_LEXICON = {
 
 
 
-# ============================================================
+  
 # 3A. EXTRA SEED TERMS FOR TOPIC-TO-CATEGORY MAPPING
-# ============================================================
-
 # These extra terms are only used to map discovered topics back to
 # structural-pragmatism categories. They do not change the main
 # pragmatism lexicon analysis.
@@ -218,10 +203,8 @@ REDDIT_STOPWORDS = {
     "finanzen", "personalfinance",
 }
 
-# ============================================================
+  
 # 3B. EXTRA TOPIC-MODELING NOISE STOPWORDS
-# ============================================================
-
 # These are NOT financial-theory stopwords.
 # They are only used for topic modeling so that generic Reddit/German filler
 # words do not become artificial topics.
@@ -312,12 +295,7 @@ STOPWORDS = sorted(
     | REDDIT_STOPWORDS
     | TOPIC_NOISE_STOPWORDS
 )
-
-
-
-# ============================================================
-# 4. HELPERS
-# ============================================================
+  
 
 def save_table(df: pd.DataFrame, filename: str) -> None:
     path = CFG.table_dir / filename
@@ -421,9 +399,9 @@ def bh_adjust(p_values: pd.Series) -> pd.Series:
     return pd.Series(adjusted, index=p_values.index)
 
 
-# ============================================================
-# 5. LOAD DATA
-# ============================================================
+  
+# LOAD DATA
+  
 
 def load_data() -> pd.DataFrame:
     if not CFG.input_path.exists():
@@ -464,9 +442,9 @@ def load_data() -> pd.DataFrame:
     return df.reset_index(drop=True)
 
 
-# ============================================================
-# 6. VECTORIZE AND CLUSTER
-# ============================================================
+  
+# VECTORIZE AND CLUSTER
+  
 
 def build_tfidf_matrix(texts: list[str]):
     vectorizer = TfidfVectorizer(
@@ -548,9 +526,9 @@ def fit_kmeans_topic_model(df: pd.DataFrame):
     return vectorizer, tfidf_matrix, kmeans, doc_topics, sil
 
 
-# ============================================================
-# 7. TOPIC TERMS
-# ============================================================
+  
+# TOPIC TERMS
+  
 
 def extract_topic_terms(
     vectorizer: TfidfVectorizer,
@@ -624,9 +602,9 @@ def add_topic_labels(
     return out
 
 
-# ============================================================
-# 8. MAP TOPICS TO STRUCTURAL PRAGMATISM CATEGORIES
-# ============================================================
+  
+# MAP TOPICS TO STRUCTURAL PRAGMATISM CATEGORIES
+  
 
 def seed_overlap(topic_terms: list[str], seed_terms: list[str]) -> tuple[int, str]:
     matched = set()
@@ -800,9 +778,9 @@ def add_mapping_to_documents(
     return out
 
 
-# ============================================================
-# 9. PREVALENCE AND TESTS
-# ============================================================
+  
+# PREVALENCE AND TESTS
+  
 
 def topic_prevalence_by_group(doc_topics: pd.DataFrame) -> pd.DataFrame:
     group_n = (
@@ -927,9 +905,7 @@ def topic_chisquare_tests(doc_topics: pd.DataFrame) -> pd.DataFrame:
     return tests
 
 
-# ============================================================
-# 10. FIGURES
-# ============================================================
+  
 
 def plot_topic_differences_by_year(
     prevalence: pd.DataFrame,
@@ -969,9 +945,6 @@ def plot_topic_differences_by_year(
         how="left",
     )
 
-    # Optional: keep this if you want to hide unmapped topics
-    # pivot = pivot[pivot["mapped_structural_category"] != "unmapped_or_general"].copy()
-
     pivot = (
         pivot.reindex(
             pivot["difference_finanzen_minus_personalfinance"]
@@ -983,22 +956,15 @@ def plot_topic_differences_by_year(
         .sort_values("difference_finanzen_minus_personalfinance")
     )
 
-    # Save full data table with long labels for transparency
     save_table(pivot, f"{filename_prefix}_topic_differences_{year}_data.csv")
 
-    # Short display labels for the plot
     pivot["topic_display"] = "T" + pivot["topic"].astype(str)
-
     fig, ax = plt.subplots(figsize=(15, 9))
-
     y = np.arange(len(pivot))
     values = pivot["difference_finanzen_minus_personalfinance"]
-
     bars = ax.barh(y, values)
     ax.axvline(0, linewidth=1)
-
     year_label = "2020 crisis year" if year == 2020 else str(year)
-
     ax.set_title(
         f"Largest topic differences: finanzen vs personalfinance, {year_label}",
         fontsize=18,
@@ -1126,18 +1092,6 @@ def plot_topic_driver_bubble_chart(
     filename_prefix: str,
     top_n: int = 16,
 ) -> None:
-    """
-    Slide-friendly topic-driver plot.
-
-    Each bubble is one KMeans topic.
-    X-axis = difference in topic share: finanzen minus personalfinance.
-    Y-axis = mapped structural category.
-    Bubble size = average topic prevalence across the two communities.
-    Label = topic ID.
-
-    This is easier to interpret than a 2D cluster projection because the
-    x-axis has direct substantive meaning.
-    """
 
     df = prevalence[prevalence["year"].eq(year)].copy()
 
@@ -1176,14 +1130,10 @@ def plot_topic_driver_bubble_chart(
         on="topic",
         how="left",
     )
-
-    # Keep only mapped topics for a cleaner presentation visual.
     pivot = pivot[
         pivot["mapped_structural_category"].notna()
         & (pivot["mapped_structural_category"] != "unmapped_or_general")
     ].copy()
-
-    # Keep the strongest topic drivers.
     pivot = (
         pivot.reindex(
             pivot["difference_finanzen_minus_personalfinance"]
@@ -1194,8 +1144,6 @@ def plot_topic_driver_bubble_chart(
         .head(top_n)
         .copy()
     )
-
-    # Category order on y-axis.
     category_order = [
         category
         for category in CATEGORY_ORDER
@@ -1208,8 +1156,6 @@ def plot_topic_driver_bubble_chart(
     }
 
     pivot["y_base"] = pivot["mapped_structural_category"].map(category_to_y)
-
-    # Small vertical jitter within category rows to avoid overlap.
     pivot = pivot.sort_values(
         ["mapped_structural_category", "difference_finanzen_minus_personalfinance"]
     ).copy()
@@ -1223,8 +1169,6 @@ def plot_topic_driver_bubble_chart(
             offsets.extend(np.linspace(-0.18, 0.18, n))
 
     pivot["y"] = pivot["y_base"] + offsets
-
-    # Bubble size.
     max_share = max(float(pivot["mean_topic_share"].max()), 0.001)
     pivot["bubble_size"] = 350 + 2200 * (pivot["mean_topic_share"] / max_share)
 
@@ -1322,9 +1266,6 @@ def plot_topic_driver_bubble_chart(
         bbox=dict(boxstyle="round", alpha=0.08),
     )
 
-    # Category labels are already on y-axis, so no legend is needed.
-    # Keeping the legend off makes the slide cleaner.
-
     save_figure(fig, f"{filename_prefix}_topic_driver_bubble_{year}.png")
 
 
@@ -1337,12 +1278,7 @@ def make_topic_driver_label_table(
     top_n: int = 12,
     n_terms: int = 3,
 ) -> None:
-    """
-    Creates a slide-friendly topic key table for the topic-driver bubble chart.
-
-    The table explains what T0, T1, T2, etc. mean.
-    """
-
+ 
     df = prevalence[prevalence["year"].eq(year)].copy()
 
     pivot = (
@@ -1378,14 +1314,10 @@ def make_topic_driver_label_table(
         on="topic",
         how="left",
     )
-
-    # Keep only mapped topics, same logic as the bubble chart.
     pivot = pivot[
         pivot["mapped_structural_category"].notna()
         & (pivot["mapped_structural_category"] != "unmapped_or_general")
     ].copy()
-
-    # Keep strongest topic drivers by absolute community difference.
     pivot = (
         pivot.reindex(
             pivot["difference_finanzen_minus_personalfinance"]
@@ -1396,18 +1328,15 @@ def make_topic_driver_label_table(
         .head(top_n)
         .copy()
     )
-
     pivot["topic_id"] = "T" + pivot["topic"].astype(int).astype(str)
     pivot["top_terms"] = pivot["topic_label"].map(
         lambda x: short_topic_terms(x, n_terms=n_terms)
     )
-
     pivot["higher_in"] = np.where(
         pivot["difference_finanzen_minus_personalfinance"] > 0,
         "finanzen",
         "personalfinance",
     )
-
     pivot["difference_pp"] = (
         pivot["difference_finanzen_minus_personalfinance"] * 100
     ).round(1)
@@ -1443,7 +1372,6 @@ def make_topic_driver_label_table(
         f"{filename_prefix}_topic_driver_key_{year}.csv",
     )
 
-    # Presentation-ready PNG table.
     display = out[
         [
             "Topic",
@@ -1475,8 +1403,6 @@ def make_topic_driver_label_table(
     table.auto_set_font_size(False)
     table.set_fontsize(10)
     table.scale(1, 1.35)
-
-    # Header styling and light row spacing.
     for (row, col), cell in table.get_celld().items():
         if row == 0:
             cell.set_text_props(weight="bold")
@@ -1493,9 +1419,8 @@ def make_topic_driver_label_table(
 
     save_figure(fig, f"{filename_prefix}_topic_driver_key_{year}.png")
 
-# ============================================================
-# 11. MAIN
-# ============================================================
+
+  
 
 def main() -> None:
     print("=" * 80)

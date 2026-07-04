@@ -1,17 +1,9 @@
-# manual_inspection_sample.py
-
 from pathlib import Path
 import pandas as pd
 
-#
-# CONFIG
+PROJECT_DIR = Path(r"SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis")
 
-
-PROJECT_DIR = Path(r"D:\Users\cheng\Documents\GitHub\SMDA_Financial_Anxiety_on_Reddit\sentiment_analysis")
-
-# Main sentiment output folder
 OUTPUT_DIR = PROJECT_DIR  / "manual_inspection" 
-
 INPUT_FILE = OUTPUT_DIR / "sentiment_scored_posts_slim.csv"
 
 OUTPUT_CSV = OUTPUT_DIR / "manual_inspection_compact_sample.csv"
@@ -28,7 +20,6 @@ FULL_INTERNAL_CSV = OUTPUT_DIR / "manual_inspection_internal_full.csv"
 
 RANDOM_SEED = 42
 
-# Compact sample size per community-year group
 N_RANDOM = 3
 N_NEGATIVE = 3
 N_NEUTRAL = 3
@@ -46,11 +37,7 @@ EMOJI_LABEL = "esr_emoji_label"
 TEXT_COL = "text_for_sentiment"
 TEXT_NO_EMOJI_COL = "text_for_sentiment_no_emoji"
 
-
-#
 # LOAD DATA
-#
-
 print(f"Loading: {INPUT_FILE}")
 data = pd.read_csv(INPUT_FILE, low_memory=False)
 
@@ -67,10 +54,7 @@ data["has_emoji"] = (
     .isin(["true", "1", "yes"])
 )
 
-
-#
 # HELPERS
-#
 
 samples = []
 
@@ -96,25 +80,24 @@ def make_short_text(text, max_chars=700):
     return text[:max_chars] + "..."
 
 
-#
+
 # SAMPLE TYPES
-#
 
 for (community, year), group in data.groupby(["community", "year"]):
 
-    # 1. Random posts
+    # Random posts
     add_sample(
         group.sample(n=min(N_RANDOM, len(group)), random_state=RANDOM_SEED),
         "random_posts"
     )
 
-    # 2. Most negative XLM posts
+    # Most negative XLM posts
     add_sample(
         group.sort_values(MAIN_SCORE, ascending=True).head(N_NEGATIVE),
         "most_negative_xlm"
     )
 
-    # 3. Most neutral XLM posts: score closest to zero
+    # Most neutral XLM posts: score closest to zero
     neutral = group.copy()
     neutral["abs_xlm_score"] = neutral[MAIN_SCORE].abs()
 
@@ -123,7 +106,7 @@ for (community, year), group in data.groupby(["community", "year"]):
         "most_neutral_xlm"
     )
 
-    # 4. Emoji posts, if available
+    # Emoji posts, if available
     emoji_posts = group[group["has_emoji"] == True].copy()
 
     if not emoji_posts.empty and EMOJI_SCORE in emoji_posts.columns:
@@ -147,9 +130,7 @@ for (community, year), group in data.groupby(["community", "year"]):
         )
 
 
-#
 # COMBINE, CLEAN, SAVE
-#
 
 if not samples:
     raise RuntimeError("No samples were created. Check input file and column names.")
@@ -167,12 +148,9 @@ manual_sample = manual_sample.drop_duplicates(
     keep="first"
 )
 
-# Add short text for easier manual inspection
 manual_sample["short_text"] = manual_sample[TEXT_COL].apply(make_short_text)
-#
-# CREATE BLINDED + ANSWER-KEY FILES
-#
 
+# CREATE BLINDED + ANSWER-KEY FILES
 # Randomize row order so the annotator cannot infer sampling type from order
 manual_sample = manual_sample.sample(
     frac=1,
@@ -188,15 +166,8 @@ manual_sample["inspection_id"] = [
 manual_sample.to_csv(FULL_INTERNAL_CSV, index=False, encoding="utf-8-sig")
 
 
-#
-# 1. BLINDED FILE FOR ANNOTATOR
-#
 
-# Important:
-# Do NOT include model scores, model labels, sample_type, community, or year.
-# sample_type is revealing because labels like "most_negative_xlm"
-# tell the annotator what the model predicted.
-
+# BLINDED FILE FOR ANNOTATOR
 blinded = manual_sample.copy()
 
 blinded["manual_text_sentiment"] = ""
@@ -260,9 +231,7 @@ except Exception as e:
 print(f"Saved blinded CSV file: {BLINDED_CSV}")
 
 
-#
-# 2. ANSWER KEY FOR LATER ANALYSIS
-#
+# ANSWER KEY FOR LATER ANALYSIS
 
 answer_key_cols = [
     "inspection_id",
