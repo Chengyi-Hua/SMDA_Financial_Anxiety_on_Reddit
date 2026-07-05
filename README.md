@@ -1,4 +1,4 @@
-# Financial Anxiety on Reddit: A Cross-Lingual Study
+# Financial Anxiety on Reddit: A Cross-Community and Cross-Lingual Study
 
 Team Project — University of Mannheim, Social and Media Data Analysis (Spring 2026).
 A cross-lingual, multi-method analysis of financial anxiety expressed in Reddit communities **r/personalfinance** (English) and **r/Finanzen** (German) across two time windows (2020 and 2025).
@@ -13,13 +13,18 @@ A cross-lingual, multi-method analysis of financial anxiety expressed in Reddit 
 ---
 
 ## Key Findings
+The findings should be interpreted as a subreddit-level communities pattern, not as absolute evidence about cultural differences.
 
-- **Temporal Changes (2020 vs. 2025):** The temporal changes over the 5-year period are statistically detectable but substantively small. Across all metrics—Distress, Sentiment, Emoji usage, and Pragmatism—the observed effect sizes remain minimal.
+- **Temporal Changes (2020 vs. 2025):** Temporal changes are statistically detectable but substantively small. Distress-related vocabulary increases modestly, but this does not translate into a uniform rise in negative sentiment. `r/Finanzen` becomes slightly more negative, while `r/personalfinance` becomes slightly less negative. Emoji use increases in both communities, especially in `r/Finanzen`.
 
-- **Cross-Community Differences:** Community differences are far more pronounced and structurally distinct than temporal shifts.
-  - **r/personalfinance (English):** Exhibits significantly higher financial distress (driven by *Anger* over short-term debt) and consistently higher shares of negative-label posts. Emojis are used less frequently. In terms of structural pragmatism, discussions focus heavily on financial institutions/products, household budgeting, and practical problem-solving.
-  - **r/Finanzen (German):** Exhibits distress levels clustering near zero (driven by *Anxiety* over long-term planning). While its mean sentiment score dropped below the English community in 2025, it features notably higher emoji usage, which predominantly functions as positive or softening tone markers. Pragmatically, discussions are strongly oriented around investment strategies (e.g., ETFs) and macroeconomic contexts.
-- **Conclusion:** Financial anxiety on Reddit is not merely an expression of raw negative affect; it manifests as community-specific practical reasoning. The American context is anchored in short-term liquidity and debt management, whereas the German context is anchored in long-term asset-allocation and market uncertainty.
+- **Cross-Community Differences:** Cross-community differences are clearer than temporal changes.
+  - **r/personalfinance (English):** Shows higher distress-related language and consistently higher shares of negative-label posts. Structurally, discussions are more strongly oriented toward financial institutions/products, household budgeting, and practical problem-solving.
+  - **r/Finanzen (German):** Shows lower distress-related language overall, but a more investment- and macroeconomic-oriented form of structural pragmatism. Emoji use is more frequent in 2025 and emojis mostly function as positive or softening tone markers.
+
+- **Conclusion:** Financial anxiety on Reddit is not only expressed through negative affect. It also appears as community-specific practical reasoning: `r/personalfinance` (English-speaking community) is more household-, budgeting-, and institution-oriented, while `r/Finanzen` (German-speaking community) is more investment-, portfolio-, and macroeconomic-oriented. The results show modest temporal changes but clearer cross-community differences. These findings highlight the importance of analyzing financial anxiety not only through sentiment, but also through distress-language and practical financial problem framing.
+
+- **Limitation:** The lexicon-based measures applied within this project are linguistic proxies, not direct measures of financial anxiety, and may miss context, irony, or negation. Cross-language comparability is limited by chosen subreddits and by the fact that related financial discussions may occur elsewhere. Reddit users are not representative of the general population.
+  
 ---
 
 ## Analysis Pipeline
