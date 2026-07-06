@@ -17,7 +17,7 @@ data_collection_and_cleaning/
 
 ### `data_collection_and_cleaning.ipynb`
 
-The notebook contains the complete and fully reproducible pipeline, including:
+The notebook contains the complete pipeline, including:
 
 - Reddit data collection using the Arctic Shift API
 - Data cleaning and preprocessing
