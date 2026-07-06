@@ -44,7 +44,7 @@ These samples allow readers to inspect the final dataset structure and preproces
 
 ## Reproducing the Full Datasets
 
-The full datasets can be recreated by running the notebook from beginning to end, assuming no changes to the data returned by the Arctic Shift API for the specified collection period and queries.
+The full datasets can be recreated by running the notebook from beginning to end, assuming no changes to the data returned by the Arctic Shift API for the specified collection period and queries, and no API-related issues during execution.
 
 The notebook performs the entire workflow, including:
 
