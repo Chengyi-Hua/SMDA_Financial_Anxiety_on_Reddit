@@ -30,7 +30,7 @@ The findings should be interpreted as a subreddit-level communities pattern, not
 ## Analysis Pipeline
 | Step | Location | Description |
 |---|---|---|
-| **1. Data Collection & Cleaning** | `data_collection_and_cleaning.ipynb` | Raw data collection via Arctic Shift, cleaning & anonymisation. |
+| **1. Data Collection & Cleaning** | `data_collection_and_cleaning/` | Raw data collection via Arctic Shift, cleaning & anonymisation. |
 | **2. EDA** | `eda_distress_analysis/eda.ipynb` | Broad exploratory overview (post-volume trends, FDI correlation, NER, TF-IDF evolution). |
 | **3. Distress Analysis (LIWC)** | `eda_distress_analysis/distress.ipynb` `eda_distress_analysis/validate_emotions.py` | LIWC keyword scoring (Anxiety, Anger, Sadness) and BERTopic modelling. Optional RoBERTa validation. |
 | **4. Sentiment Analysis** | `sentiment_analysis/` | Main XLM-RoBERTa pipeline, emoji affect, statistical tests, and visualisations. |
@@ -47,7 +47,7 @@ The findings should be interpreted as a subreddit-level communities pattern, not
 | DE-2020 | r/Finanzen | 2020 | German |
 | DE-2025 | r/Finanzen | 2025 | German |
 
-Raw posts were collected via the Reddit API / Arctic Shift, then cleaned and anonymised (usernames removed). Cleaned files are stored in `Cleaned and Anonymized Data/`.
+Raw posts were collected via the Reddit API / Arctic Shift, then cleaned and anonymised (usernames removed). Cleaned files are stored in `data_collection_and_cleaning/cleaned_and_anonymized_data/`.
 
 ---
 
