@@ -7,8 +7,12 @@ A cross-lingual, multi-method analysis of financial anxiety expressed in Reddit 
 
 ## Research Questions
 
-- **RQ1.** How did distress-related language, sentiment, emoji tone, and structural pragmatism change between 2020 and 2025?
-- **RQ2.** How do English- and German-language Reddit finance communities differ in their emotional and pragmatic framing of financial problems?
+- **RQ1.** Did distress-related language, sentiment, and structural pragmatism change between 2020 and 2025? 
+- **RQ2.** Do English- and German-language Reddit finance communities differ in their emotional and pragmatic framing of financial problems?
+
+with corresponding:
+- **H1:** Distress-related language, sentiment, and structural pragmatism differ between 2020 and 2025. 
+- **H2:** Distress-related language, sentiment, and structural pragmatism differ between \textit{r/personalfinance} and \textit{r/Finanzen}.
 
 ---
 
