@@ -55,6 +55,15 @@ The notebook performs the entire workflow, including:
 
 Executing the notebook therefore reproduces both the raw datasets (before cleaning) and the final processed datasets used in our analyses.
 
+### Requirements
+
+Before running the notebook, install the required Python packages (`pandas`, `requests`, `matplotlib`, and `fastText`) and download the fastText language identification model (`lid.176.bin`).
+
+Place the downloaded model file in the same directory as the notebook.
+
+The model can be downloaded from the official fastText documentation:
+
+https://fasttext.cc/docs/en/language-identification.html
 ---
 
 ## Cleaning Log
