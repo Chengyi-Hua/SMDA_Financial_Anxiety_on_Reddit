@@ -44,7 +44,7 @@ These samples allow readers to inspect the final dataset structure and preproces
 
 ## Reproducing the Full Datasets
 
-The full datasets can be recreated by running the notebook from beginning to end.
+The full datasets can be recreated by running the notebook from beginning to end, assuming no changes to the data returned by the Arctic Shift API for the specified collection period and queries.
 
 The notebook performs the entire workflow, including:
 
@@ -53,7 +53,8 @@ The notebook performs the entire workflow, including:
 3. Applying every cleaning and preprocessing step
 4. Producing the final cleaned and anonymized datasets
 
-Executing the notebook therefore reproduces both the raw datasets (before cleaning) and the final processed datasets used in our analyses.
+Executing the notebook therefore reproduces both the raw datasets (before cleaning) and the final processed datasets.
+> **Note:** Arctic Shift API rate limits may vary over time. If you encounter rate limit errors while running the notebook, consider increasing the request delay (currently `0.25` seconds via `time.sleep()`) until the requests complete successfully.
 
 ### Requirements
 
