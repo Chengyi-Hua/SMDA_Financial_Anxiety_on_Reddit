@@ -1,18 +1,22 @@
 # Financial Anxiety on Reddit: A Cross-Community and Cross-Lingual Study
 
-Team Project — University of Mannheim, Social and Media Data Analysis (Spring 2026).
+Team Project — University of Mannheim, Social Media Data Analysis (Spring 2026).
 A cross-lingual, multi-method analysis of financial anxiety expressed in Reddit communities **r/personalfinance** (English) and **r/Finanzen** (German) across two time windows (2020 and 2025).
+
+
+### For specific description and explanation, there are READMEs within each subfolder.
+
 
 ---
 
-## Research Questions
+## Research Questions within the project (**r/personalfinance** (English) and **r/Finanzen** (German))
 
 - **RQ1.** Did distress-related language, sentiment, and structural pragmatism change between 2020 and 2025? 
 - **RQ2.** Do English- and German-language Reddit finance communities differ in their emotional and pragmatic framing of financial problems?
 
 with corresponding:
 - **H1:** Distress-related language, sentiment, and structural pragmatism differ between 2020 and 2025. 
-- **H2:** Distress-related language, sentiment, and structural pragmatism differ between \textit{r/personalfinance} and \textit{r/Finanzen}.
+- **H2:** Distress-related language, sentiment, and structural pragmatism differ between **r/personalfinance**  and **r/Finanzen** 
 
 ---
 
@@ -32,6 +36,9 @@ The findings should be interpreted as a subreddit-level communities pattern, not
 ---
 
 ## Analysis Pipeline
+
+
+
 | Step | Location | Description |
 |---|---|---|
 | **1. Data Collection & Cleaning** | `data_collection_and_cleaning/` | Raw data collection via Arctic Shift, cleaning & anonymisation. |
@@ -51,7 +58,7 @@ The findings should be interpreted as a subreddit-level communities pattern, not
 | DE-2020 | r/Finanzen | 2020 | German |
 | DE-2025 | r/Finanzen | 2025 | German |
 
-Raw posts were collected via the Reddit API / Arctic Shift, then cleaned and anonymised (usernames removed). Cleaned files are stored in `data_collection_and_cleaning/cleaned_and_anonymized_data/`.
+Raw posts were collected via the Arctic Shift, then cleaned and anonymised (usernames removed). Cleaned files are stored in `data_collection_and_cleaning/cleaned_and_anonymized_data/`.
 
 ---
 
